@@ -18,9 +18,11 @@ Stock dependencies only (ResolveURL, six, kodi-six, …). Do not install depende
 
 ## Direct zip (fastest)
 
-https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/raw/cursor/cumination-portrait-framing-7784/artifacts/plugin.video.cumination.andrew-1.2.4.zip
+https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.4/plugin.video.cumination.andrew-1.2.4.zip
 
 If 1.2.3 is already installed, install this zip over it (Unknown sources on).
+
+Release page: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.4
 
 ## Optional: repository 1.1.2 (this repo + existing deps)
 
