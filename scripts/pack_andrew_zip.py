@@ -10,7 +10,7 @@ import zipfile
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 ADDON_ID = 'plugin.video.cumination.andrew'
-EXCLUDE_DIRS = {'.git', '__pycache__', 'artifacts', 'tests', 'scripts'}
+EXCLUDE_DIRS = {'.git', '__pycache__', 'artifacts', 'tests', 'scripts', 'workshop'}
 EXCLUDE_FILES = {'.gitignore'}
 
 

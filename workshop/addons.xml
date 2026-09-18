@@ -31,7 +31,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.cumination.andrew" name="Cumination (Andrew)" provider-name="Cumination / Andrew Webber" version="1.2.4">
+<addon id="plugin.video.cumination.andrew" name="Cumination (Andrew)" provider-name="Cumination / Andrew Webber" version="1.2.5">
     <requires>
         <import addon="script.module.six" />
         <import addon="script.module.kodi-six" />
@@ -41,6 +41,7 @@
         <import addon="script.module.websocket" version="0.50.0" />
         <import addon="script.module.inputstreamhelper" />
         <import addon="script.module.requests" />
+        <import addon="script.module.pil" />
     </requires>
     <extension library="default.py" point="xbmc.python.pluginsource">
         <provides>video</provides>

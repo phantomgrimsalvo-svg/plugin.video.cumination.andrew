@@ -1,3 +1,9 @@
+[B]Version 1.2.5[/B]
+- Portrait fanart modes A/B/C now fetch https thumbs (when Use thumbnail as fanart + portrait extras are both on) and cache originals under artcache/src so each mode writes a real 16:9 JPEG
+- Requires script.module.pil so Pillow is present for framing
+- Site logos: resolve special:// / addon image paths by basename against resources/images and framed/; remote site-folder icons are fetched once and padded into cache
+- Pack-time framed square+poster generated for every file in resources/images
+
 [B]Version 1.2.4[/B]
 - Site logos: padded square thumb/icon + 2:3 poster so portrait/circle/poster views keep the full site name (clearlogo/banner/landscape stay the full wide logo)
 - Portrait fanart framing (unlocked with Use thumbnail as fanart + Also use portrait thumbs as fanart / background):

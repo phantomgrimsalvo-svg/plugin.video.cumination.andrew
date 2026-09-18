@@ -95,6 +95,7 @@ def _andrew_art_settings():
         cache_dir=_art_cache_dir(),
         framed_dir=_framed_logo_dir(),
         addon_fanart=_addon_fanart(),
+        images_dir=imgDir,
     )
 
 

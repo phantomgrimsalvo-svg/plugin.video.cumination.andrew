@@ -2,10 +2,10 @@
 
 Personal Kodi fork for Andrew Webber. **Not** an official Cumination release.
 
-- Addon id: `plugin.video.cumination.andrew` **1.2.4**
+- Addon id: `plugin.video.cumination.andrew` **1.2.5**
 - Features: **Search all sites**, **Use thumbnail as fanart**, **portrait thumbs as fanart**, **site logo art that stays readable on portrait/circle views**, **portrait fanart framing A/B/C**
 - Portrait fanart and site thumbs are **addon ListItem art** — they work in **any skin** (Estuary, Arctic Fuse 3, …). Arctic Fuse 3 (Andrew) is optional extra polish.
-- Dependencies are **stock** (`script.module.resolveurl`, `script.module.six`, …). No dependency forks.
+- Dependencies are **stock** (`script.module.resolveurl`, `script.module.six`, `script.module.pil`, …). No dependency forks.
 - Install from **Andrew's Kodi Workshop** repository so ResolveURL and the other requires resolve from that repo.
 
 ## Where the new framing settings live
@@ -38,9 +38,9 @@ A plugin cannot animate Estuary’s built-in fanart by itself. Cumination (Andre
 
 Arctic Fuse 3 (Andrew) 3.3.3+ uses those properties when present.
 
-- Zip: [`artifacts/plugin.video.cumination.andrew-1.2.4.zip`](artifacts/plugin.video.cumination.andrew-1.2.4.zip)
-- Public download: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.4/plugin.video.cumination.andrew-1.2.4.zip
-- Release: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.4
+- Zip: [`artifacts/plugin.video.cumination.andrew-1.2.5.zip`](artifacts/plugin.video.cumination.andrew-1.2.5.zip)
+- Public download: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.5/plugin.video.cumination.andrew-1.2.5.zip
+- Release: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.5
 - Workshop on this repo: [`workshop/`](workshop/) (`repository.andrew` 1.1.2 reads `main/workshop/addons.xml` plus the existing AF3 workshop for stock ResolveURL)
 
 Upstream Cumination / dobbelina, GPL v2. Do not PR this tree to dobbelina.

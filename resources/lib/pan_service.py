@@ -101,6 +101,7 @@ def run():
                 cache_dir=cache_dir,
                 framed_dir=framed_dir,
                 addon_fanart='',
+                images_dir=os_join_images(translate(addon.getAddonInfo('path'))),
             )
             mode = _focused_property('Andrew.FanartMode') or ''
             if settings.get('portrait_fanart_mode') == andrew_art.MODE_PAN:
@@ -170,3 +171,8 @@ def os_join_cache(profile):
 def os_join_framed(root):
     import os
     return os.path.join(root, 'resources', 'images', 'framed')
+
+
+def os_join_images(root):
+    import os
+    return os.path.join(root, 'resources', 'images')

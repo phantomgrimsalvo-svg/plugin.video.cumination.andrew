@@ -15,7 +15,7 @@ try:
 except ImportError:
     Image = None
 
-ART_CACHE_VERSION = '124'
+ART_CACHE_VERSION = '125'
 FANART_W, FANART_H = 1280, 720
 POSTER_W, POSTER_H = 512, 768
 SQUARE_W, SQUARE_H = 512, 512
@@ -67,12 +67,13 @@ def default_settings():
         'addon_fanart': '',
         'cache_dir': '',
         'framed_dir': '',
+        'images_dir': '',
         'allow_remote_fetch': False,
-        'remote_timeout': 1.5,
+        'remote_timeout': 4,
     }
 
 
-def settings_from_addon(addon, cache_dir, framed_dir, addon_fanart):
+def settings_from_addon(addon, cache_dir, framed_dir, addon_fanart, images_dir=''):
     """Read Cumination (Andrew) settings into a plain dict."""
     extras = addon.getSetting('portrait_fanart_extras')
     mode_idx = addon.getSetting('portrait_fanart_mode') or '0'
@@ -92,17 +93,20 @@ def settings_from_addon(addon, cache_dir, framed_dir, addon_fanart):
         pan_secs = int(duration)
     except (TypeError, ValueError):
         pan_secs = 20
+    posterfanart = addon.getSetting('posterfanart') == 'true'
+    extras_on = extras != 'false'
     return {
-        'posterfanart': addon.getSetting('posterfanart') == 'true',
-        'portrait_fanart_extras': extras != 'false',
+        'posterfanart': posterfanart,
+        'portrait_fanart_extras': extras_on,
         'portrait_fanart_mode': p_mode,
         'portrait_fanart_pan_duration': max(6, min(60, pan_secs)),
         'landscape_fanart_mode': l_mode,
         'addon_fanart': addon_fanart,
         'cache_dir': cache_dir,
         'framed_dir': framed_dir,
-        'allow_remote_fetch': False,
-        'remote_timeout': 1.5,
+        'images_dir': images_dir,
+        'allow_remote_fetch': bool(posterfanart and extras_on),
+        'remote_timeout': 4,
     }
 
 
@@ -119,6 +123,79 @@ def _is_url(path):
     return path.startswith('http://') or path.startswith('https://')
 
 
+def _strip_kodi_suffix(src):
+    path = src or ''
+    if '|' in path:
+        path = path.split('|', 1)[0]
+    if '?' in path and not _is_url(path):
+        path = path.split('?', 1)[0]
+    return path
+
+
+def _translate_special(path):
+    if not path:
+        return path
+    if path.startswith('special://') or path.startswith('resource://'):
+        try:
+            from kodi_six import xbmc, xbmcvfs
+            translate = xbmcvfs.translatePath if hasattr(xbmcvfs, 'translatePath') else xbmc.translatePath
+            return translate(path)
+        except Exception:
+            return path
+    return path
+
+
+def _image_stem(src):
+    name = os.path.basename(_strip_kodi_suffix(src).replace('\\', '/'))
+    stem, _ext = os.path.splitext(name)
+    return stem or name
+
+
+def _local_image_candidates(src, settings=None):
+    """Resolve special://, addon-relative, and basename matches under images_dir.
+
+    Basename matching is for Kodi special:// / addon paths that point at
+    resources/images. Remote http(s) URLs are not matched by basename so a
+    generic ``logo.png`` on a site CDN cannot pick the wrong packed image.
+    """
+    settings = settings or {}
+    raw = _strip_kodi_suffix(src)
+    translated = _translate_special(raw)
+    images_dir = settings.get('images_dir') or ''
+    stem = _image_stem(translated or raw)
+    out = []
+    if translated and os.path.isfile(translated):
+        out.append(translated)
+    elif raw and (not _is_url(raw)) and os.path.isfile(raw):
+        out.append(raw)
+    marker = '/resources/images/'
+    norm = raw.replace('\\', '/')
+    allow_basename = (not _is_url(raw)) or (marker in norm)
+    if images_dir and stem and allow_basename:
+        base = os.path.basename(norm)
+        if base:
+            direct = os.path.join(images_dir, base)
+            if os.path.isfile(direct):
+                out.append(direct)
+        for ext in ('.png', '.jpg', '.jpeg', '.gif', '.webp'):
+            candidate = os.path.join(images_dir, stem + ext)
+            if os.path.isfile(candidate):
+                out.append(candidate)
+    if images_dir and marker in norm:
+        fname = norm.split(marker, 1)[-1]
+        if fname and '/' not in fname:
+            candidate = os.path.join(images_dir, fname)
+            if os.path.isfile(candidate):
+                out.append(candidate)
+    seen = set()
+    uniq = []
+    for path in out:
+        if path not in seen:
+            seen.add(path)
+            uniq.append(path)
+    return uniq
+
+
 def _cache_name(src, kind, extra=''):
     key = u'{0}|{1}|{2}|{3}'.format(ART_CACHE_VERSION, kind, src, extra)
     digest = hashlib.md5(key.encode('utf-8', 'replace')).hexdigest()
@@ -126,24 +203,37 @@ def _cache_name(src, kind, extra=''):
     return digest + ext
 
 
+def _src_cache_path(url, settings):
+    cache_dir = settings.get('cache_dir')
+    if not cache_dir:
+        return None
+    ext = os.path.splitext(_strip_kodi_suffix(url).split('?')[0])[-1].lower()
+    if ext not in ('.png', '.jpg', '.jpeg', '.gif', '.webp'):
+        ext = '.img'
+    return os.path.join(cache_dir, 'src', _cache_name(url, 'src', '')[:-4] + ext)
+
+
 def _open_image(src, settings=None):
     ImageMod = _import_pil()
     if ImageMod is None or not src:
         return None
     settings = settings or {}
-    path = src
-    if _is_url(src):
+    path = None
+    locals_found = _local_image_candidates(src, settings)
+    if locals_found:
+        path = locals_found[0]
+    elif _is_url(src):
         if not settings.get('allow_remote_fetch'):
-            cached = _cached_url_original(src, settings)
-            if cached:
-                path = cached
-            else:
+            path = _cached_url_original(src, settings)
+            if not path:
                 return None
         else:
             path = _fetch_url(src, settings)
             if not path:
                 return None
-    if not os.path.isfile(path):
+    elif os.path.isfile(src):
+        path = src
+    if not path or not os.path.isfile(path):
         return None
     try:
         im = ImageMod.open(path)
@@ -154,28 +244,20 @@ def _open_image(src, settings=None):
 
 
 def _cached_url_original(url, settings):
-    cache_dir = settings.get('cache_dir')
-    if not cache_dir:
-        return None
-    path = os.path.join(cache_dir, 'src', _cache_name(url, 'src', '')[:-4] + os.path.splitext(url.split('?')[0])[-1][:5])
-    if os.path.isfile(path) and os.path.getsize(path) > 32:
+    path = _src_cache_path(url, settings)
+    if path and os.path.isfile(path) and os.path.getsize(path) > 32:
         return path
     return None
 
 
 def _fetch_url(url, settings):
-    cache_dir = settings.get('cache_dir')
-    if not cache_dir:
+    dest = _src_cache_path(url, settings)
+    if not dest:
         return None
-    dest_dir = os.path.join(cache_dir, 'src')
-    _ensure_dir(dest_dir)
-    ext = os.path.splitext(url.split('?')[0])[-1].lower()
-    if ext not in ('.png', '.jpg', '.jpeg', '.gif', '.webp'):
-        ext = '.img'
-    dest = os.path.join(dest_dir, _cache_name(url, 'src', '')[:-4] + ext)
+    _ensure_dir(os.path.dirname(dest))
     if os.path.isfile(dest) and os.path.getsize(dest) > 32:
         return dest
-    timeout = settings.get('remote_timeout') or 1.5
+    timeout = settings.get('remote_timeout') or 4
     try:
         from six.moves import urllib_request
         req = urllib_request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -323,18 +405,50 @@ def pan_frame_fanart(im, progress, tw=FANART_W, th=FANART_H):
     return cropped
 
 
+def _shipped_stems(src, settings):
+    """Basenames to look up under framed/ (local + special:// images only)."""
+    if not src:
+        return []
+    raw = _strip_kodi_suffix(src)
+    stems = []
+    marker = '/resources/images/'
+    norm = raw.replace('\\', '/')
+    if not _is_url(raw):
+        stem = _image_stem(raw)
+        if stem:
+            stems.append(stem)
+    if marker in norm:
+        fname = norm.split(marker, 1)[-1]
+        if fname and '/' not in fname:
+            stems.append(os.path.splitext(fname)[0])
+    for path in _local_image_candidates(src, settings):
+        stems.append(os.path.splitext(os.path.basename(path))[0])
+    seen = set()
+    out = []
+    for stem in stems:
+        if stem and stem not in seen:
+            seen.add(stem)
+            out.append(stem)
+    return out
+
+
 def _shipped_framed(src, kind, settings):
-    """Use pack-time framed logos next to the original file when present."""
-    if _is_url(src) or not src:
+    """Use pack-time framed logos, matching basename even for special:// paths."""
+    if not src:
         return None
     framed_dir = settings.get('framed_dir')
     if not framed_dir:
-        base = os.path.dirname(src)
-        framed_dir = os.path.join(base, 'framed')
-    name = os.path.splitext(os.path.basename(src))[0] + '.png'
-    path = os.path.join(framed_dir, kind, name)
-    if os.path.isfile(path):
-        return path
+        locals_found = _local_image_candidates(src, settings)
+        if locals_found:
+            framed_dir = os.path.join(os.path.dirname(locals_found[0]), 'framed')
+        elif not _is_url(src):
+            framed_dir = os.path.join(os.path.dirname(_strip_kodi_suffix(src)), 'framed')
+        else:
+            return None
+    for stem in _shipped_stems(src, settings):
+        path = os.path.join(framed_dir, kind, stem + '.png')
+        if os.path.isfile(path):
+            return path
     return None
 
 
@@ -357,7 +471,12 @@ def framed_logo_paths(src, settings):
         if os.path.isfile(square) and os.path.isfile(poster):
             return square, poster
 
-    im = _open_image(src, settings)
+    open_settings = dict(settings)
+    # Site-folder logos: fetch a remote icon once (cached under cache_dir/src)
+    # even when video thumb fetch is off, so portrait/circle views can pad it.
+    if _is_url(src) and not (shipped_sq and shipped_po):
+        open_settings['allow_remote_fetch'] = True
+    im = _open_image(src, open_settings)
     if im is None:
         return shipped_sq, shipped_po
     try:
@@ -425,6 +544,10 @@ def pan_frame_paths(src, settings, count=PAN_FRAMES):
 
 
 def _folder_is_logo(src, settings):
+    if _shipped_framed(src, 'square', settings) or _shipped_framed(src, 'poster', settings):
+        return True
+    # Remote / unreadable icons default to logo (wide site wordmark). Only skip
+    # padding when we can open a local portrait still.
     kind = aspect_kind(src, settings, default='landscape')
     return kind != 'portrait'
 
@@ -629,8 +752,6 @@ def generate_shipped_framed_logos(img_dir, framed_dir):
             continue
         src = os.path.join(img_dir, name)
         if not os.path.isfile(src):
-            continue
-        if aspect_kind(src, settings, default='landscape') == 'portrait':
             continue
         im = _open_image(src, settings)
         if im is None:
