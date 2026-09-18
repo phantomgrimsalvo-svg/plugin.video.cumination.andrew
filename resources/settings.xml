@@ -5,8 +5,12 @@
         <setting id="customview" label="30008" type="bool" default="false" />
         <setting id="m3u8_use_ia" label="30016" type="bool" default="false" />
         <setting id="paradisehill" label="30004" type="bool" default="false" />
+        <setting type="lsep" label="33030" />
         <setting id="posterfanart" label="30005" type="bool" default="false" />
-        <setting id="portrait_fanart_extras" label="33028" type="bool" default="true" />
+        <setting id="portrait_fanart_extras" label="33028" type="bool" default="true" enable="eq(-1,true)" />
+        <setting id="portrait_fanart_mode" label="33031" type="enum" lvalues="33032|33033|33034" default="0" enable="eq(-1,true)+eq(-2,true)" />
+        <setting id="portrait_fanart_pan_duration" label="33035" type="slider" default="20" range="6,2,60" option="int" enable="eq(-1,2)+eq(-2,true)+eq(-3,true)" />
+        <setting id="landscape_fanart_mode" label="33036" type="enum" lvalues="33037|33038|33039" default="0" enable="eq(-4,true)" />
         <setting id="quality_in_name" label="30009" type="bool" default="true" />
         <setting id="duration_in_name" label="30010" type="bool" default="true" />
         <setting id="download_path" type="folder" source="video" label="30052"  option="writeable" default=""/>

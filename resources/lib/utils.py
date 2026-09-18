@@ -37,7 +37,8 @@ from resources.lib import cloudflare, random_ua, strings, jsunpack
 from resources.lib.basics import (
     addDir, addon, addon_handle, addon_sys,
     cookiePath, cum_image, cuminationicon, eod,
-    favoritesdb, keys, searchDir, profileDir
+    favoritesdb, keys, searchDir, profileDir,
+    _apply_andrew_art
 )
 from resources.lib.brotlidecpy import decompress
 from resources.lib.url_dispatcher import URL_Dispatcher
@@ -380,7 +381,7 @@ def playvid(videourl, name, download=None, subtitle=None, IA_check='check'):
         iconimage = xbmc.getInfoImage("ListItem.Thumb")
         subject = xbmc.getInfoLabel("ListItem.Plot")
         listitem = xbmcgui.ListItem(name)
-        listitem.setArt({'thumb': iconimage, 'icon': "DefaultVideo.png", 'poster': iconimage})
+        _apply_andrew_art(listitem, iconimage, fanart=iconimage, is_folder=False)
         if KODIVER > 19.8:
             vtag = listitem.getVideoInfoTag()
             vtag.setTitle(name)

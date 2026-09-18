@@ -1,3 +1,22 @@
+[B]Version 1.2.4[/B]
+- Site logos: padded square thumb/icon + 2:3 poster so portrait/circle/poster views keep the full site name (clearlogo/banner/landscape stay the full wide logo)
+- Portrait fanart framing (unlocked with Use thumbnail as fanart + Also use portrait thumbs as fanart / background):
+  A) Pillarbox — full portrait in the landscape fanart slot with black bars
+  B) Fill, top-aligned — zoom to fill, anchored at the top so faces are not cut off
+  C) Slow pan top → bottom — framed start frame + service Window properties for a skin Ken Burns hook
+- Optional landscape thumb framing (original / letterbox / center crop)
+- Settings live in Cumination (Andrew) → General, under "Thumbnail as fanart"
+
+[B]Version 1.2.3[/B]
+- Portrait→fanart and site thumbs are addon ListItem art (any skin: Estuary, AF3, …)
+- Site folders set icon/thumb/poster/clearlogo/banner to the site image
+- Stock requires only (ResolveURL / six / kodi-six / …); no dependency forks
+
+[B]Version 1.2.2[/B]
+- Portrait thumbs become fanart/background when "Use thumbnail as fanart" AND "Also use portrait thumbs as fanart / background" are both on
+- Site folders use clearlogo/banner/thumb (never poster) so Arctic Fuse 3 (Andrew) can keep-aspect logos
+- ListItem Fanart_Image + Andrew.ArtType/ArtAspect/PortraitFanart properties for mixed-aspect skins
+
 [B]Version 1.1.199[/B]
 - anybunny - fixed playback, listing
 - Xvideos fixed player for AI generated
