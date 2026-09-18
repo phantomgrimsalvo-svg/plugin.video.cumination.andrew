@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addons>
+<addon id="repository.andrew" name="Andrew's Kodi Workshop" version="1.1.2" provider-name="Andrew Webber">
+    <extension point="xbmc.addon.repository" name="Andrew's Kodi Workshop">
+        <dir>
+            <info compressed="false">https://raw.githubusercontent.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/main/workshop/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/main/workshop/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/main/workshop/zips/</datadir>
+        </dir>
+        <dir>
+            <info compressed="false">https://raw.githubusercontent.com/phantomgrimsalvo-svg/skin.arctic.fuse.3.andrew/main/workshop/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/phantomgrimsalvo-svg/skin.arctic.fuse.3.andrew/main/workshop/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/phantomgrimsalvo-svg/skin.arctic.fuse.3.andrew/main/workshop/zips/</datadir>
+        </dir>
+        <dir>
+            <info compressed="false">https://raw.githubusercontent.com/Gujal00/smrzips/master/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/Gujal00/smrzips/master/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/Gujal00/smrzips/master/zips/</datadir>
+        </dir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Andrew's personal Kodi forks plus stock Cumination dependencies</summary>
+        <description lang="en_GB">Install Cumination (Andrew) from this repository. 1.1.2 reads Cumination zips from plugin.video.cumination.andrew (main) and keeps stock ResolveURL / six / kodi-six from the existing workshop and Gujal smrzips. Personal forks only — not affiliated with jurialmunkey, dobbelina, or Gujal.</description>
+        <disclaimer lang="en_GB">Adult add-on included (Cumination). Enable Unknown sources in Kodi first.</disclaimer>
+        <platform>all</platform>
+        <license>GPL-2.0-or-later</license>
+        <source>https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew</source>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="plugin.video.cumination.andrew" name="Cumination (Andrew)" provider-name="Cumination / Andrew Webber" version="1.2.5">
+    <requires>
+        <import addon="script.module.six" />
+        <import addon="script.module.kodi-six" />
+        <import addon="script.module.resolveurl" version="5.1.00" />
+        <import addon="script.module.resolveurl.xxx" version="2.1.0" />
+        <import addon="script.common.plugin.cache" />
+        <import addon="script.module.websocket" version="0.50.0" />
+        <import addon="script.module.inputstreamhelper" />
+        <import addon="script.module.requests" />
+        <import addon="script.module.pil" />
+    </requires>
+    <extension library="default.py" point="xbmc.python.pluginsource">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" />
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <license>GPL 2.0</license>
+        <summary lang="en_GB">Cumination, the culmination of adult sites on Kodi</summary>
+        <description lang="en_GB">Cumination, the culmination of adult sites on Kodi</description>
+        <disclaimer lang="en_GB">The author does not host or distribute any of the content displayed by this addon. The author does not have any affiliation with the sites offered. Click on About from the contextmenu on each site to check for contact details.</disclaimer>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+</addons>

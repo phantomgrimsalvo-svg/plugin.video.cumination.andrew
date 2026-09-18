@@ -73,6 +73,59 @@ def eod(handle=addon_handle, cache=True):
     xbmcplugin.endOfDirectory(handle, cacheToDisc=cache)
 
 
+def _addon_fanart():
+    return os.path.join(rootDir, 'fanart.jpg')
+
+
+def _art_cache_dir():
+    path = os.path.join(profileDir, 'artcache')
+    if not os.path.exists(path):
+        os.makedirs(path)
+    return path
+
+
+def _framed_logo_dir():
+    return os.path.join(imgDir, 'framed')
+
+
+def _andrew_art_settings():
+    from resources.lib import andrew_art
+    return andrew_art.settings_from_addon(
+        addon,
+        cache_dir=_art_cache_dir(),
+        framed_dir=_framed_logo_dir(),
+        addon_fanart=_addon_fanart(),
+        images_dir=imgDir,
+    )
+
+
+def _apply_andrew_art(liz, iconimage, fanart=None, is_folder=False):
+    """Set ListItem art so ANY skin can use it (Estuary, AF3, ...).
+
+    Site logos: full wordmark on clearlogo/banner/landscape; padded square
+    thumb/icon and 2:3 poster so portrait/circle views do not chop the name.
+
+    Videos: thumb/poster = still. When Use thumbnail as fanart + portrait
+    extras are on, fanart is framed (pillarbox / top-fill / pan).
+    """
+    from resources.lib import andrew_art
+    if not iconimage:
+        iconimage = cuminationicon
+    art, _props = andrew_art.apply_to_listitem(
+        liz, iconimage, fanart=fanart, is_folder=is_folder,
+        settings=_andrew_art_settings(),
+    )
+    return art
+
+
+def _finish_andrew_art(liz, art):
+    liz.setArt(art)
+    fanart = art.get('fanart')
+    if fanart:
+        liz.setProperty('Fanart_Image', fanart)
+        liz.setProperty('fanart', fanart)
+
+
 def addImgLink(name, url, mode):
     u = (sys.argv[0]
          + "?url=" + urllib_parse.quote_plus(url)
@@ -81,7 +134,7 @@ def addImgLink(name, url, mode):
     liz = xbmcgui.ListItem(name)
     if KODIVER < 19.8:
         liz.setInfo(type='pictures', infoLabels={'title': name})
-    liz.setArt({'thumb': url, 'icon': url, 'poster': url})
+    _apply_andrew_art(liz, url, fanart=url, is_folder=False)
     ok = xbmcplugin.addDirectoryItem(handle=addon_handle, url=u, listitem=liz, isFolder=False)
     return ok
 
@@ -168,21 +221,7 @@ def addDownLink(name, url, mode, iconimage, desc='', stream=None, fav='add', noD
             video_streaminfo = {'codec': 'h264'}
         liz.addStreamInfo('video', video_streaminfo)
 
-    if not fanart:
-        fanart = os.path.join(rootDir, 'fanart.jpg')
-        if addon.getSetting('posterfanart') == 'true':
-            fanart = iconimage
-
-    art = {'thumb': iconimage, 'icon': "DefaultVideo.png", 'poster': iconimage, 'fanart': fanart}
-    # portrait fanart extras: treat the listing portrait/thumb as extra fanart for skins
-    if addon.getSetting('portrait_fanart_extras') != 'false':
-        art.update({
-            'landscape': fanart or iconimage,
-            'keyart': iconimage,
-            'fanart1': iconimage,
-            'extrafanart': fanart or iconimage,
-        })
-    liz.setArt(art)
+    _apply_andrew_art(liz, iconimage, fanart=fanart, is_folder=False)
 
     if stream:
         liz.setProperty('IsPlayable', 'true')
@@ -291,12 +330,7 @@ def addDir(name, url, mode, iconimage=None, page=None, channel=None, section=Non
     if not iconimage:
         iconimage = cuminationicon
     liz = xbmcgui.ListItem(name)
-    fanart = os.path.join(rootDir, 'fanart.jpg')
-    art = {'thumb': iconimage, 'icon': "DefaultFolder.png", 'fanart': fanart}
-    if addon.getSetting('posterfanart') == 'true':
-        fanart = iconimage
-        art.update({'poster': iconimage})
-    liz.setArt(art)
+    _apply_andrew_art(liz, iconimage, fanart=None, is_folder=True)
 
     # --- META DESCRIPTION SUPPORT ---
     try:

@@ -685,12 +685,52 @@ msgid "sessionid"
 msgstr ""
 
 msgctxt "#33028"
-msgid "Portrait fanart extras"
-msgstr "Portrait fanart extras"
+msgid "Also use portrait thumbs as fanart / background"
+msgstr "Also use portrait thumbs as fanart / background"
 
 msgctxt "#33029"
 msgid "Search all sites"
 msgstr "Search all sites"
+
+msgctxt "#33030"
+msgid "Thumbnail as fanart (Estuary / any skin)"
+msgstr "Thumbnail as fanart (Estuary / any skin)"
+
+msgctxt "#33031"
+msgid "Portrait fanart framing"
+msgstr "Portrait fanart framing"
+
+msgctxt "#33032"
+msgid "A: Pillarbox (black bars, no face crop)"
+msgstr "A: Pillarbox (black bars, no face crop)"
+
+msgctxt "#33033"
+msgid "B: Fill, top-aligned (no top cutoff)"
+msgstr "B: Fill, top-aligned (no top cutoff)"
+
+msgctxt "#33034"
+msgid "C: Slow pan top → bottom"
+msgstr "C: Slow pan top → bottom"
+
+msgctxt "#33035"
+msgid "Pan duration (seconds)"
+msgstr "Pan duration (seconds)"
+
+msgctxt "#33036"
+msgid "Landscape thumb framing"
+msgstr "Landscape thumb framing"
+
+msgctxt "#33037"
+msgid "Original"
+msgstr "Original"
+
+msgctxt "#33038"
+msgid "Letterbox"
+msgstr "Letterbox"
+
+msgctxt "#33039"
+msgid "Center crop"
+msgstr "Center crop"
 
 msgctxt "#33027"
 msgid "Page Item Limit (0=no pagination)"
