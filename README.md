@@ -38,4 +38,8 @@ A plugin cannot animate Estuary’s built-in fanart by itself. Cumination (Andre
 
 Arctic Fuse 3 (Andrew) 3.3.3+ uses those properties when present.
 
-Upstream Cumination / dobbelina, GPL v2. Do not PR this tree to dobbelina.
+- Zip: [`artifacts/plugin.video.cumination.andrew-1.2.4.zip`](artifacts/plugin.video.cumination.andrew-1.2.4.zip)
+- Public download (this repo): https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/raw/cursor/cumination-portrait-framing-7784/artifacts/plugin.video.cumination.andrew-1.2.4.zip
+- After merge to main: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/raw/main/artifacts/plugin.video.cumination.andrew-1.2.4.zip
+- Workshop on this repo: [`workshop/`](workshop/) (`repository.andrew` 1.1.2 reads `main/workshop/addons.xml` plus the existing AF3 workshop for stock ResolveURL)
+
