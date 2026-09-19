@@ -87,10 +87,14 @@ class FramingTests(unittest.TestCase):
         self.assertEqual(props.get('Andrew.ArtType'), 'logo')
         self.assertEqual(built['clearlogo'], logo)
         self.assertEqual(built['banner'], logo)
-        self.assertEqual(built['landscape'], logo)
         self.assertEqual(built['poster'], poster)
         self.assertEqual(built['thumb'], square)
         self.assertEqual(props.get('Andrew.LogoSafe'), 'true')
+        # Fanart/landscape are 16:9 letterboxed so Estuary Fanart view
+        # does not cover-crop the wordmark.
+        self.assertNotEqual(built['fanart'], logo)
+        self.assertEqual(built['landscape'], built['fanart'])
+        self.assertTrue(os.path.isfile(built['fanart']))
 
     def test_pillarbox_mode_a_no_face_crop(self):
         portrait = os.path.join(self.tmpdir, 'actress.jpg')
@@ -195,6 +199,128 @@ class FramingTests(unittest.TestCase):
         fanart = Image.open(built['fanart'])
         self.assertEqual(fanart.size, (art.FANART_W, art.FANART_H))
         fanart.close()
+
+    def _nonblack_bbox(self, im, threshold=40):
+        rgb = im.convert('RGB')
+        px = rgb.load()
+        w, h = rgb.size
+        xs = []
+        ys = []
+        for y in range(h):
+            for x in range(w):
+                if sum(px[x, y]) > threshold:
+                    xs.append(x)
+                    ys.append(y)
+        rgb.close()
+        if not xs:
+            return None
+        return min(xs), min(ys), max(xs), max(ys)
+
+    def test_small_portrait_pillarbox_fills_height_not_postage_stamp(self):
+        # Live Cum Louder pornstars thumbs are ~233×261. thumbnail() left these
+        # unscaled in the middle of 1280×720; Mode A must upscale to full height.
+        portrait = os.path.join(self.tmpdir, 'small-pornstar.jpg')
+        im = Image.new('RGB', (233, 261), (0, 160, 160))
+        im.paste(Image.new('RGB', (233, 30), (255, 0, 255)), (0, 0))
+        im.save(portrait, 'JPEG', quality=95)
+        im.close()
+
+        settings = dict(self.settings)
+        settings['posterfanart'] = True
+        settings['portrait_fanart_extras'] = True
+        settings['portrait_fanart_mode'] = art.MODE_PILLARBOX
+        settings['allow_remote_fetch'] = True
+        built, props = art.build_art(portrait, is_folder=False, settings=settings)
+        self.assertEqual(props.get('Andrew.FanartMode'), art.MODE_PILLARBOX)
+        fanart = Image.open(built['fanart'])
+        self.assertEqual(fanart.size, (art.FANART_W, art.FANART_H))
+
+        bbox = self._nonblack_bbox(fanart)
+        self.assertIsNotNone(bbox)
+        left, top, right, bottom = bbox
+        content_h = bottom - top + 1
+        content_w = right - left + 1
+        # Scaled height == 720: image fills height, top/bottom margins ~0.
+        self.assertGreaterEqual(content_h, art.FANART_H - 4)
+        self.assertLessEqual(top, 2)
+        self.assertGreaterEqual(bottom, art.FANART_H - 3)
+        # Classic pillarbox: black side bars, roughly equal, no 1:1 postage stamp.
+        expected_w = int(round(233 * (float(art.FANART_H) / 261.0)))
+        self.assertAlmostEqual(content_w, expected_w, delta=6)
+        self.assertGreater(left, 80)
+        self.assertGreater(art.FANART_W - 1 - right, 80)
+        self.assertAlmostEqual(left, art.FANART_W - 1 - right, delta=8)
+        left_px = fanart.getpixel((2, art.FANART_H // 2))
+        right_px = fanart.getpixel((art.FANART_W - 3, art.FANART_H // 2))
+        self.assertLess(sum(left_px), 40)
+        self.assertLess(sum(right_px), 40)
+        # Mid-column is content (teal), not a black hole around a tiny stamp.
+        mid = fanart.getpixel((art.FANART_W // 2, art.FANART_H // 2))
+        self.assertGreater(mid[1] + mid[2], 200)
+        fanart.close()
+
+    def test_small_portrait_cover_modes_fill_canvas(self):
+        portrait = os.path.join(self.tmpdir, 'tiny-cover.jpg')
+        im = Image.new('RGB', (233, 261), (200, 40, 40))
+        im.save(portrait, 'JPEG', quality=95)
+        im.close()
+        src = Image.open(portrait)
+        for fn in (art.cover_top_fanart, art.cover_center_fanart):
+            framed = fn(src)
+            self.assertEqual(framed.size, (art.FANART_W, art.FANART_H))
+            # Cover must fill the canvas — no large black margins.
+            bbox = self._nonblack_bbox(framed)
+            self.assertIsNotNone(bbox)
+            left, top, right, bottom = bbox
+            self.assertLessEqual(left, 2)
+            self.assertLessEqual(top, 2)
+            self.assertGreaterEqual(right, art.FANART_W - 3)
+            self.assertGreaterEqual(bottom, art.FANART_H - 3)
+            framed.close()
+        pan = art.pan_frame_fanart(src, 0.0)
+        self.assertEqual(pan.size, (art.FANART_W, art.FANART_H))
+        bbox = self._nonblack_bbox(pan)
+        left, top, right, bottom = bbox
+        self.assertLessEqual(left, 2)
+        self.assertLessEqual(top, 2)
+        self.assertGreaterEqual(right, art.FANART_W - 3)
+        self.assertGreaterEqual(bottom, art.FANART_H - 3)
+        pan.close()
+        src.close()
+
+    def test_folder_logo_fanart_is_letterboxed_16x9(self):
+        logo = os.path.join(self.tmpdir, 'ah.png')
+        im = Image.new('RGB', (800, 80), (0, 0, 0))
+        im.paste(Image.new('RGB', (760, 48), (220, 20, 20)), (20, 16))
+        im.save(logo)
+        im.close()
+
+        settings = dict(self.settings)
+        settings['posterfanart'] = True
+        built, props = art.build_art(logo, is_folder=True, settings=settings)
+        self.assertEqual(props.get('Andrew.ArtType'), 'logo')
+        self.assertEqual(built['clearlogo'], logo)
+        self.assertEqual(built['thumb'].endswith('.png') or os.path.isfile(built['thumb']), True)
+        self.assertNotEqual(built['fanart'], logo)
+        fanart = Image.open(built['fanart'])
+        self.assertEqual(fanart.size, (art.FANART_W, art.FANART_H))
+        bbox = self._nonblack_bbox(fanart)
+        self.assertIsNotNone(bbox)
+        left, top, right, bottom = bbox
+        # Full wordmark: spans most of the width, letterboxed top/bottom.
+        self.assertGreater(right - left, int(art.FANART_W * 0.85))
+        self.assertGreater(top, 200)
+        self.assertLess(bottom, art.FANART_H - 200)
+        top_bar = fanart.getpixel((art.FANART_W // 2, 4))
+        self.assertLess(sum(top_bar), 40)
+        fanart.close()
+        # Padded square/poster still used for thumb/poster.
+        thumb_im = Image.open(built['thumb'])
+        poster_im = Image.open(built['poster'])
+        self.assertEqual(thumb_im.size, (art.SQUARE_W, art.SQUARE_H))
+        self.assertEqual(poster_im.size, (art.POSTER_W, art.POSTER_H))
+        thumb_im.close()
+        poster_im.close()
 
     def test_settings_from_addon_gates_remote_fetch(self):
         class FakeAddon(object):

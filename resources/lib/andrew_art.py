@@ -15,7 +15,7 @@ try:
 except ImportError:
     Image = None
 
-ART_CACHE_VERSION = '125'
+ART_CACHE_VERSION = '126'
 FANART_W, FANART_H = 1280, 720
 POSTER_W, POSTER_H = 512, 768
 SQUARE_W, SQUARE_H = 512, 512
@@ -320,6 +320,26 @@ def _save(im, dest, as_jpeg=False):
     return dest
 
 
+def _contain_scale(sw, sh, tw, th):
+    """Scale so the full image fits inside the target (never crop)."""
+    if sw <= 0 or sh <= 0:
+        return 1.0
+    return min(float(tw) / float(sw), float(th) / float(sh))
+
+
+def _cover_scale(sw, sh, tw, th):
+    """Scale so the image covers the target (may crop). Always upscales."""
+    if sw <= 0 or sh <= 0:
+        return 1.0
+    return max(float(tw) / float(sw), float(th) / float(sh))
+
+
+def _resize_exact(src, nw, nh, ImageMod):
+    nw = max(1, int(nw))
+    nh = max(1, int(nh))
+    return src.resize((nw, nh), ImageMod.LANCZOS)
+
+
 def fit_on_canvas(im, canvas_w, canvas_h, margin=0.12, bgcolor=(0, 0, 0, 255)):
     """Letterbox/pillarbox `im` onto a canvas so the full wordmark stays visible."""
     ImageMod = _import_pil()
@@ -327,44 +347,57 @@ def fit_on_canvas(im, canvas_w, canvas_h, margin=0.12, bgcolor=(0, 0, 0, 255)):
     src = im.convert('RGBA')
     max_w = max(1, int(canvas_w * (1.0 - 2.0 * margin)))
     max_h = max(1, int(canvas_h * (1.0 - 2.0 * margin)))
-    src.thumbnail((max_w, max_h), ImageMod.LANCZOS)
-    x = (canvas_w - src.size[0]) // 2
-    y = (canvas_h - src.size[1]) // 2
-    canvas.alpha_composite(src, (x, y))
+    scale = _contain_scale(src.size[0], src.size[1], max_w, max_h)
+    resized = _resize_exact(src, src.size[0] * scale, src.size[1] * scale, ImageMod)
     src.close()
+    x = (canvas_w - resized.size[0]) // 2
+    y = (canvas_h - resized.size[1]) // 2
+    canvas.alpha_composite(resized, (x, y))
+    resized.close()
     return canvas
 
 
 def pillarbox_to_fanart(im, tw=FANART_W, th=FANART_H):
-    """Mode A: fit the full image into 16:9 with black bars (no crop)."""
+    """Mode A / letterbox: contain-scale onto 16:9, then center.
+
+    Portraits fill the full fanart height (black bars left/right only).
+    Wide images fill the full width (black bars top/bottom). Small thumbs
+    are upscaled — never pasted 1:1 onto the 1280×720 canvas.
+    """
     ImageMod = _import_pil()
     src = im.convert('RGB')
-    canvas = ImageMod.new('RGB', (tw, th), (0, 0, 0))
-    fitted = src.copy()
-    fitted.thumbnail((tw, th), ImageMod.LANCZOS)
-    x = (tw - fitted.size[0]) // 2
-    y = (th - fitted.size[1]) // 2
-    canvas.paste(fitted, (x, y))
+    sw, sh = src.size
+    scale = _contain_scale(sw, sh, tw, th)
+    nw = max(1, int(round(sw * scale)))
+    nh = max(1, int(round(sh * scale)))
+    if nw > tw:
+        nw = tw
+        nh = max(1, int(round(sh * (float(tw) / float(sw)))))
+    if nh > th:
+        nh = th
+        nw = max(1, int(round(sw * (float(th) / float(sh)))))
+    resized = _resize_exact(src, nw, nh, ImageMod)
     src.close()
-    fitted.close()
+    canvas = ImageMod.new('RGB', (tw, th), (0, 0, 0))
+    x = (tw - resized.size[0]) // 2
+    y = (th - resized.size[1]) // 2
+    canvas.paste(resized, (x, y))
+    resized.close()
     return canvas
 
 
 def cover_top_fanart(im, tw=FANART_W, th=FANART_H):
-    """Mode B: scale to fill 16:9, anchored to the TOP (faces stay visible)."""
+    """Mode B: scale to COVER 16:9, anchored to the TOP (faces stay visible)."""
     ImageMod = _import_pil()
     src = im.convert('RGB')
     sw, sh = src.size
-    scale = max(float(tw) / float(sw), float(th) / float(sh))
+    scale = _cover_scale(sw, sh, tw, th)
     nw = max(tw, int(round(sw * scale)))
     nh = max(th, int(round(sh * scale)))
-    resized = src.resize((nw, nh), ImageMod.LANCZOS)
+    resized = _resize_exact(src, nw, nh, ImageMod)
     src.close()
-    left = max(0, (nw - tw) // 2)
-    top = 0
-    if nh < th:
-        top = 0
-    cropped = resized.crop((left, top, left + tw, top + th))
+    left = max(0, (resized.size[0] - tw) // 2)
+    cropped = resized.crop((left, 0, left + tw, th))
     resized.close()
     return cropped
 
@@ -373,32 +406,31 @@ def cover_center_fanart(im, tw=FANART_W, th=FANART_H):
     ImageMod = _import_pil()
     src = im.convert('RGB')
     sw, sh = src.size
-    scale = max(float(tw) / float(sw), float(th) / float(sh))
+    scale = _cover_scale(sw, sh, tw, th)
     nw = max(tw, int(round(sw * scale)))
     nh = max(th, int(round(sh * scale)))
-    resized = src.resize((nw, nh), ImageMod.LANCZOS)
+    resized = _resize_exact(src, nw, nh, ImageMod)
     src.close()
-    left = max(0, (nw - tw) // 2)
-    top = max(0, (nh - th) // 2)
+    left = max(0, (resized.size[0] - tw) // 2)
+    top = max(0, (resized.size[1] - th) // 2)
     cropped = resized.crop((left, top, left + tw, top + th))
     resized.close()
     return cropped
 
 
 def pan_frame_fanart(im, progress, tw=FANART_W, th=FANART_H):
-    """progress 0.0 = top (face), 1.0 = bottom."""
+    """progress 0.0 = top (face), 1.0 = bottom. Always covers 16:9."""
     ImageMod = _import_pil()
     src = im.convert('RGB')
     sw, sh = src.size
-    scale = max(float(tw) / float(sw), float(th) / float(sh))
-    # Prefer filling width so a portrait is taller than 16:9 and can pan.
-    scale = max(scale, float(tw) / float(sw))
+    # Cover, preferring fill-width so a portrait is taller than 16:9 and can pan.
+    scale = max(_cover_scale(sw, sh, tw, th), float(tw) / float(sw) if sw else 1.0)
     nw = max(tw, int(round(sw * scale)))
     nh = max(th, int(round(sh * scale)))
-    resized = src.resize((nw, nh), ImageMod.LANCZOS)
+    resized = _resize_exact(src, nw, nh, ImageMod)
     src.close()
-    left = max(0, (nw - tw) // 2)
-    max_top = max(0, nh - th)
+    left = max(0, (resized.size[0] - tw) // 2)
+    max_top = max(0, resized.size[1] - th)
     top = int(round(max(0.0, min(1.0, float(progress))) * max_top))
     cropped = resized.crop((left, top, left + tw, top + th))
     resized.close()
@@ -633,7 +665,18 @@ def _build_folder_art(iconimage, settings, posterfanart, extras, default_fanart,
     }
     if posterfanart:
         if props.get('Andrew.ArtType') == 'logo':
-            art['fanart'] = iconimage
+            # Estuary Fanart view cover-crops raw wide PNGs. Bake a 16:9
+            # letterboxed JPEG so the full wordmark stays visible.
+            logo_settings = dict(settings)
+            if _is_url(iconimage):
+                logo_settings['allow_remote_fetch'] = True
+            logo_fanart = framed_fanart_path(iconimage, MODE_LETTERBOX, logo_settings)
+            art['fanart'] = logo_fanart or iconimage
+            if logo_fanart:
+                art['landscape'] = logo_fanart
+                props['Andrew.FanartFramed'] = 'true'
+                props['Andrew.FanartMode'] = MODE_LETTERBOX
+                props['Andrew.FanartAspect'] = 'keep'
         elif extras:
             framed, fprops = _framed_thumb_fanart(iconimage, p_mode, settings)
             art['fanart'] = framed or iconimage

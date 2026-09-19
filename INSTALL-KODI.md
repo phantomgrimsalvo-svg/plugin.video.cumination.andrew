@@ -1,4 +1,4 @@
-# Install Cumination (Andrew) 1.2.5
+# Install Cumination (Andrew) 1.2.6
 
 ## Framing settings (read this)
 
@@ -7,22 +7,22 @@
 1. Turn on **Use video thumbnail for poster/fanart**.
 2. Keep **Also use portrait thumbs as fanart / background** on.
 3. **Portrait fanart framing**
-   - **A: Pillarbox (black bars, no face crop)**
+   - **A: Pillarbox** — portrait scaled to full fanart height, black bars left/right only
    - **B: Fill, top-aligned (no top cutoff)**
    - **C: Slow pan top → bottom** (set **Pan duration**)
 4. Optional **Landscape thumb framing**.
 
-With both toggles on, A/B/C download the https thumb once (cached) and bake a 16:9 JPEG, so the modes look different. Site names on portrait/circle/poster views are padded automatically (local packed logos plus a one-time fetch for remote site icons).
+With both toggles on, A/B/C download the https thumb once (cached) and bake a 16:9 JPEG. Site folders use a letterboxed 16:9 fanart so Estuary Fanart view keeps the full name; portrait/circle/poster views still use the padded square/poster.
 
 Requires stock **script.module.pil** (Pillow) in addition to ResolveURL, six, kodi-six, …. Do not install dependency forks.
 
 ## Direct zip (fastest)
 
-https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.5/plugin.video.cumination.andrew-1.2.5.zip
+https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.6/plugin.video.cumination.andrew-1.2.6.zip
 
-If 1.2.4 (or 1.2.3) is already installed, install this zip over it (Unknown sources on).
+If 1.2.5 (or earlier) is already installed, install this zip over it (Unknown sources on). Old 1.2.5 framed cache is ignored (`ART_CACHE_VERSION` 126).
 
-Release page: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.5
+Release page: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.6
 
 ## Optional: repository 1.1.2 (this repo + existing deps)
 
