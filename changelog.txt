@@ -1,3 +1,8 @@
+[B]Version 1.2.6[/B]
+- Mode A pillarbox (and letterbox) now upscale small portrait thumbs to full 720px height with black bars only on the left/right — no more postage-stamp in the middle
+- Mode B/C cover and pan always scale to fill 1280×720
+- Site/folder logos used as fanart are a 16:9 letterboxed JPEG so Estuary Fanart view does not cover-crop the wordmark (padded square/poster unchanged)
+
 [B]Version 1.2.5[/B]
 - Portrait fanart modes A/B/C now fetch https thumbs (when Use thumbnail as fanart + portrait extras are both on) and cache originals under artcache/src so each mode writes a real 16:9 JPEG
 - Requires script.module.pil so Pillow is present for framing
