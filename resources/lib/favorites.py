@@ -27,12 +27,14 @@ from resources.lib import basics
 from resources.lib import utils
 from resources.lib.url_dispatcher import URL_Dispatcher
 from resources.lib.adultsite import AdultSite
+from resources.lib.db_schema import migrate_custom_list_schema
 
 url_dispatcher = URL_Dispatcher('favorites')
 
 dialog = utils.dialog
 favoritesdb = basics.favoritesdb
 orders = {'random': 'RANDOM()', 'date added': 'ROWID DESC', 'name': 'NAME COLLATE NOCASE', 'site & date': 'MODE, ROWID DESC', 'site & name': 'MODE, DOMAIN, NAME COLLATE NOCASE', 'site & date, in folders': 'MODE, ROWID DESC', 'site & name, in folders': 'MODE, NAME COLLATE NOCASE'}
+
 
 conn = sqlite3.connect(favoritesdb)
 c = conn.cursor()
@@ -42,6 +44,7 @@ try:
     c.executescript("CREATE TABLE IF NOT EXISTS custom_sites (author, name, title, url, image, about, version, installed_at, enabled, module_file);")
     c.executescript("CREATE TABLE IF NOT EXISTS custom_lists (name);")
     c.executescript("CREATE TABLE IF NOT EXISTS custom_listitems (name, url, mode, image, list_id);")
+    migrate_custom_list_schema(c)
 
     c.execute('PRAGMA table_info(favorites);')
     res = c.fetchall()
@@ -50,6 +53,7 @@ try:
         c.execute(addColumn)
         addColumn = "ALTER TABLE favorites ADD COLUMN quality"
         c.execute(addColumn)
+    conn.commit()
 except:
     pass
 conn.close()
@@ -955,7 +959,7 @@ def create_custom_list():
     conn = sqlite3.connect(favoritesdb)
     conn.text_factory = str
     c = conn.cursor()
-    c.execute("INSERT INTO custom_lists VALUES (?)", (name,))
+    c.execute("INSERT INTO custom_lists (name) VALUES (?)", (name,))
     conn.commit()
     conn.close()
     xbmc.executebuiltin('Container.Refresh')
@@ -965,10 +969,31 @@ def get_custom_lists():
     conn = sqlite3.connect(favoritesdb)
     conn.text_factory = str
     c = conn.cursor()
-    c.execute("SELECT rowid, name FROM custom_lists")
+    try:
+        c.execute("SELECT rowid, name, thumb, fanart, poster FROM custom_lists")
+    except sqlite3.OperationalError:
+        c.execute("SELECT rowid, name FROM custom_lists")
+        rows = [(row[0], row[1], None, None, None) for row in c.fetchall()]
+        conn.close()
+        return rows
     rows = c.fetchall()
     conn.close()
     return rows
+
+
+def get_custom_list_art(rowid):
+    conn = sqlite3.connect(favoritesdb)
+    conn.text_factory = str
+    c = conn.cursor()
+    try:
+        c.execute("SELECT thumb, fanart, poster FROM custom_lists WHERE rowid = ?", (int(rowid),))
+        row = c.fetchone()
+    except (sqlite3.OperationalError, ValueError, TypeError):
+        row = None
+    conn.close()
+    if not row:
+        return ('', '', '')
+    return (row[0] or '', row[1] or '', row[2] or '')
 
 
 def get_custom_listitems():
@@ -1085,6 +1110,58 @@ def edit_list(rowid):
     conn = sqlite3.connect(favoritesdb)
     c = conn.cursor()
     c.execute("UPDATE custom_lists set name = ? WHERE rowid = ?", (name, int(rowid),))
+    conn.commit()
+    conn.close()
+    xbmc.executebuiltin('Container.Refresh')
+
+
+def _pick_list_image():
+    choice = utils.dialog.select('Image source', ['Browse file', 'Enter URL'])
+    if choice == 0:
+        path = utils.dialog.browse(2, 'Select image', 'pictures')
+        return path or ''
+    if choice == 1:
+        return utils._get_keyboard(heading='Image URL') or ''
+    return ''
+
+
+@url_dispatcher.register()
+def set_list_artwork(rowid):
+    options = ['Thumb / icon', 'Fanart', 'Poster', 'All (same image)']
+    which = utils.dialog.select('Set list artwork', options)
+    if which < 0:
+        return
+    src = _pick_list_image()
+    if not src:
+        return
+    fields = ['thumb', 'fanart', 'poster']
+    conn = sqlite3.connect(favoritesdb)
+    c = conn.cursor()
+    migrate_custom_list_schema(c)
+    if which == 3:
+        c.execute(
+            "UPDATE custom_lists SET thumb = ?, fanart = ?, poster = ? WHERE rowid = ?",
+            (src, src, src, int(rowid)),
+        )
+    else:
+        c.execute(
+            "UPDATE custom_lists SET {0} = ? WHERE rowid = ?".format(fields[which]),
+            (src, int(rowid)),
+        )
+    conn.commit()
+    conn.close()
+    xbmc.executebuiltin('Container.Refresh')
+
+
+@url_dispatcher.register()
+def clear_list_artwork(rowid):
+    conn = sqlite3.connect(favoritesdb)
+    c = conn.cursor()
+    migrate_custom_list_schema(c)
+    c.execute(
+        "UPDATE custom_lists SET thumb = NULL, fanart = NULL, poster = NULL WHERE rowid = ?",
+        (int(rowid),),
+    )
     conn.commit()
     conn.close()
     xbmc.executebuiltin('Container.Refresh')

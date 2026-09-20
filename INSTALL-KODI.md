@@ -1,4 +1,14 @@
-# Install Cumination (Andrew) 1.2.6
+# Install Cumination (Andrew) 1.2.7
+
+## Skin search URL (Arctic Fuse 3)
+
+Paste this in an AF3 / any-skin search widget. The skin appends the query after `keyword=`; the addon will **not** pop the keyboard:
+
+```
+plugin://plugin.video.cumination.andrew/?mode=skin_search&keyword=
+```
+
+See `SEARCH-URL.md` in this zip for aliases (`mode=search`, `mode=global_search`) and optional `&sort=date|views|rating`.
 
 ## Framing settings (read this)
 
@@ -18,11 +28,11 @@ Requires stock **script.module.pil** (Pillow) in addition to ResolveURL, six, ko
 
 ## Direct zip (fastest)
 
-https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.6/plugin.video.cumination.andrew-1.2.6.zip
+https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.7/plugin.video.cumination.andrew-1.2.7.zip
 
-If 1.2.5 (or earlier) is already installed, install this zip over it (Unknown sources on). Old 1.2.5 framed cache is ignored (`ART_CACHE_VERSION` 126).
+If 1.2.6 (or earlier) is already installed, install this zip over it (Unknown sources on). Favorites and keywords databases are migrated in place (custom list artwork columns are added; nothing is wiped).
 
-Release page: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.6
+Release page: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.7
 
 ## Optional: repository 1.1.2 (this repo + existing deps)
 

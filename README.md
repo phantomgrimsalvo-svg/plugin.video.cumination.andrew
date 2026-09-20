@@ -2,11 +2,23 @@
 
 Personal Kodi fork for Andrew Webber. **Not** an official Cumination release.
 
-- Addon id: `plugin.video.cumination.andrew` **1.2.6**
-- Features: **Search all sites**, **Use thumbnail as fanart**, **portrait thumbs as fanart**, **site logo art that stays readable on portrait/circle views**, **portrait fanart framing A/B/C**
+- Addon id: `plugin.video.cumination.andrew` **1.2.7**
+- Features: **aggregated Search all sites**, **AF3/skin search URL**, **combined-list sort**, **add to keywords**, **custom list artwork**, **Use thumbnail as fanart**, **portrait thumbs as fanart**, **site logo art that stays readable on portrait/circle views**, **portrait fanart framing A/B/C**
 - Portrait fanart and site thumbs are **addon ListItem art** — they work in **any skin** (Estuary, Arctic Fuse 3, …). Arctic Fuse 3 (Andrew) is optional extra polish.
 - Dependencies are **stock** (`script.module.resolveurl`, `script.module.six`, `script.module.pil`, …). No dependency forks.
 - Install from **Andrew's Kodi Workshop** repository so ResolveURL and the other requires resolve from that repo.
+
+## Aggregated search + AF3
+
+Menu **Search all sites** still prompts for a keyword, then lists playable hits from many sites in **one directory** (`[SiteName] title`).
+
+For Arctic Fuse 3 (or any skin search widget) use:
+
+```
+plugin://plugin.video.cumination.andrew/?mode=skin_search&keyword=
+```
+
+Details: [SEARCH-URL.md](SEARCH-URL.md).
 
 ## Where the new framing settings live
 
@@ -38,9 +50,9 @@ A plugin cannot animate Estuary’s built-in fanart by itself. Cumination (Andre
 
 Arctic Fuse 3 (Andrew) 3.3.3+ uses those properties when present.
 
-- Zip: [`artifacts/plugin.video.cumination.andrew-1.2.6.zip`](artifacts/plugin.video.cumination.andrew-1.2.6.zip)
-- Public download: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.6/plugin.video.cumination.andrew-1.2.6.zip
-- Release: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.6
+- Zip: [`artifacts/plugin.video.cumination.andrew-1.2.7.zip`](artifacts/plugin.video.cumination.andrew-1.2.7.zip)
+- Public download: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.7/plugin.video.cumination.andrew-1.2.7.zip
+- Release: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.7
 - Workshop on this repo: [`workshop/`](workshop/) (`repository.andrew` 1.1.2 reads `main/workshop/addons.xml` plus the existing AF3 workshop for stock ResolveURL)
 
 Upstream Cumination / dobbelina, GPL v2. Do not PR this tree to dobbelina.
