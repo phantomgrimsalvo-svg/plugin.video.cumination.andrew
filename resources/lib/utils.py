@@ -1241,9 +1241,12 @@ def textBox(heading, announce):
             try:
                 self.win.getControl(self.CONTROL_LABEL).setLabel(heading)
                 try:
-                    f = open(announce)
-                    text = f.read()
-                except:
+                    from resources.lib import textio
+                    if announce and os.path.isfile(announce):
+                        text = textio.read_utf8(announce)
+                    else:
+                        raise IOError('not a file')
+                except Exception:
                     text = announce
                 self.win.getControl(self.CONTROL_TEXTBOX).setText(str(text))
             except RuntimeError:

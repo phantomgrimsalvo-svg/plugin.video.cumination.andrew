@@ -2,6 +2,7 @@
 """Pure helpers for image/list precache (no Kodi, never downloads videos)."""
 from __future__ import absolute_import
 
+import io
 import json
 import os
 import re
@@ -233,7 +234,7 @@ def load_job(path):
     if not path or not os.path.isfile(path):
         return None
     try:
-        with open(path, 'r') as fh:
+        with io.open(path, 'r', encoding='utf-8', errors='replace') as fh:
             data = json.load(fh)
     except Exception:
         return None
@@ -248,7 +249,7 @@ def save_job(path, job):
         os.makedirs(directory)
     tmp = path + '.tmp'
     payload = normalize_job(job) or job
-    with open(tmp, 'w') as fh:
+    with io.open(tmp, 'w', encoding='utf-8') as fh:
         json.dump(payload, fh, indent=2, sort_keys=True)
         fh.flush()
         try:

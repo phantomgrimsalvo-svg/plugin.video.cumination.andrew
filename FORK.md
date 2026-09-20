@@ -6,7 +6,7 @@ Do not open pull requests against jurialmunkey or dobbelina from this tree.
 | | |
 |---|---|
 | Addon id | `plugin.video.cumination.andrew` |
-| Version | `1.2.9` |
+| Version | `1.2.10` |
 | License | GPL-2.0-or-later |
 | Upstream | https://github.com/dobbelina/repository.dobbelina (plugin.video.cumination 1.1.199) |
 | Upstream authors | Cumination / dobbelina |

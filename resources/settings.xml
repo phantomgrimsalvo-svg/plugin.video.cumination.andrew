@@ -17,6 +17,26 @@
         <setting id="setpin" type="action" label="30028" enable="true" option="close" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=pin.SetPin)" />
         <setting id="content" type="enum" label="30500" lvalues="30501|30502" default="0" />
     </category>
+    <category label="33200">
+        <setting type="lsep" label="33200" />
+        <setting id="sites_choose" type="action" label="33201" enable="true" option="close" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=siteflags.choose_enabled)" />
+        <setting id="sites_enable_all" type="action" label="33202" enable="true" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=siteflags.enable_all)" />
+        <setting id="sites_disable_all" type="action" label="33203" enable="true" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=siteflags.disable_all)" />
+        <setting id="sites_disable_webcams" type="action" label="33204" enable="true" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=siteflags.disable_webcams)" />
+        <setting id="sites_status" type="text" label="33205" default="All sites enabled" enable="false" />
+    </category>
+    <category label="33210">
+        <setting type="lsep" label="33211" />
+        <setting id="precache_choose" type="action" label="33212" enable="true" option="close" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=precache.choose_sites)" />
+        <setting id="precache_sync_enabled" type="action" label="33213" enable="true" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=precache.sync_enabled)" />
+        <setting id="precache_depth" type="slider" label="33214" default="2" range="1,1,4" option="int" />
+        <setting id="precache_max_items" type="slider" label="33215" default="2500" range="0,100,10000" option="int" />
+        <setting id="precache_max_mb" type="slider" label="33216" default="400" range="0,50,2000" option="int" />
+        <setting id="precache_concurrency" type="slider" label="33217" default="4" range="1,1,8" option="int" />
+        <setting id="precache_now" type="action" label="33218" enable="true" option="close" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=precache.start)" />
+        <setting id="precache_stop" type="action" label="33219" enable="true" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=precache.stop)" />
+        <setting id="precache_status" type="text" label="33220" default="Never run" enable="false" />
+    </category>
     <category label="33100">
         <setting type="lsep" label="33100" />
         <setting id="global_search_sort" type="enum" lvalues="33109|33110|33111|33112" label="33108" default="0"/>
@@ -92,25 +112,5 @@
         <setting id="fs_host" enable="eq(-1,true)" type="text" label="33023" default="http://localhost:8191/v1"/>
         <setting type="lsep" label="33025" />
         <setting id="sessionid" type="text" label="33026" default=""/>
-    </category>
-    <category label="33200">
-        <setting type="lsep" label="33200" />
-        <setting id="sites_choose" type="action" label="33201" enable="true" option="close" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=siteflags.choose_enabled)" />
-        <setting id="sites_enable_all" type="action" label="33202" enable="true" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=siteflags.enable_all)" />
-        <setting id="sites_disable_all" type="action" label="33203" enable="true" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=siteflags.disable_all)" />
-        <setting id="sites_disable_webcams" type="action" label="33204" enable="true" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=siteflags.disable_webcams)" />
-        <setting id="sites_status" type="text" label="33205" default="All sites enabled" enable="false" />
-    </category>
-    <category label="33210">
-        <setting type="lsep" label="33211" />
-        <setting id="precache_choose" type="action" label="33212" enable="true" option="close" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=precache.choose_sites)" />
-        <setting id="precache_sync_enabled" type="action" label="33213" enable="true" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=precache.sync_enabled)" />
-        <setting id="precache_depth" type="slider" label="33214" default="2" range="1,1,4" option="int" />
-        <setting id="precache_max_items" type="slider" label="33215" default="2500" range="0,100,10000" option="int" />
-        <setting id="precache_max_mb" type="slider" label="33216" default="400" range="0,50,2000" option="int" />
-        <setting id="precache_concurrency" type="slider" label="33217" default="4" range="1,1,8" option="int" />
-        <setting id="precache_now" type="action" label="33218" enable="true" option="close" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=precache.start)" />
-        <setting id="precache_stop" type="action" label="33219" enable="true" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=precache.stop)" />
-        <setting id="precache_status" type="text" label="33220" default="Never run" enable="false" />
     </category>
 </settings>

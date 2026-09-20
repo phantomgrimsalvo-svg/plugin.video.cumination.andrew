@@ -494,6 +494,11 @@ def service_tick(monitor=None, budget_sec=2.0):
 @url_dispatcher.register()
 def start():
     start_job()
+    try:
+        from kodi_six import xbmc
+        xbmc.executebuiltin('Container.Refresh')
+    except Exception:
+        pass
 
 
 @url_dispatcher.register()
@@ -508,6 +513,11 @@ def stop():
         precache_lib.save_job(job_path(), job)
         refresh_status_setting(job)
     _notify('Stop requested')
+    try:
+        from kodi_six import xbmc
+        xbmc.executebuiltin('Container.Refresh')
+    except Exception:
+        pass
 
 
 @url_dispatcher.register()
@@ -528,7 +538,13 @@ def choose_sites():
     selected = [sites[i].name for i in choice if 0 <= i < len(sites)]
     state['precache_sites'] = [n.lower() for n in selected]
     siteflags.save_state(state)
+    refresh_status_setting()
     _notify('{0} site(s) selected for precache'.format(len(selected)))
+    try:
+        from kodi_six import xbmc
+        xbmc.executebuiltin('Container.Refresh')
+    except Exception:
+        pass
 
 
 @url_dispatcher.register()
@@ -537,4 +553,38 @@ def sync_enabled():
     state['precache_sites'] = None
     siteflags.save_state(state)
     names = [n for n in siteflags.catalog_names() if siteflags.is_enabled(n)]
+    refresh_status_setting()
     _notify('Precache list follows {0} enabled site(s)'.format(len(names)))
+    try:
+        from kodi_six import xbmc
+        xbmc.executebuiltin('Container.Refresh')
+    except Exception:
+        pass
+
+
+@url_dispatcher.register()
+def menu():
+    """Directory of precache actions (reachable from INDEX)."""
+    status = refresh_status_setting()
+    icon = basics.cum_image('cum-downloads.png')
+    basics.addDir(
+        '[COLOR hotpink]{0}[/COLOR]'.format(status),
+        '', 'precache.menu', icon, Folder=False, list_avail=False,
+    )
+    basics.addDir(
+        '[COLOR white]Choose sites to precache[/COLOR]',
+        '', 'precache.choose_sites', icon, Folder=False, list_avail=False,
+    )
+    basics.addDir(
+        '[COLOR white]Precache list: use enabled sites[/COLOR]',
+        '', 'precache.sync_enabled', icon, Folder=False, list_avail=False,
+    )
+    basics.addDir(
+        '[COLOR hotpink]Precache now[/COLOR]',
+        '', 'precache.start', icon, Folder=False, list_avail=False,
+    )
+    basics.addDir(
+        '[COLOR white]Stop precache[/COLOR]',
+        '', 'precache.stop', icon, Folder=False, list_avail=False,
+    )
+    utils.eod(basics.addon_handle, False)

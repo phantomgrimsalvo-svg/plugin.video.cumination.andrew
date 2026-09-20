@@ -2,6 +2,7 @@
 """Site enable/disable and precache-site allowlists (no Kodi)."""
 from __future__ import absolute_import
 
+import io
 import json
 import os
 
@@ -49,7 +50,7 @@ def load_state(path):
     if not path or not os.path.isfile(path):
         return default_state()
     try:
-        with open(path, 'r') as fh:
+        with io.open(path, 'r', encoding='utf-8', errors='replace') as fh:
             data = json.load(fh)
     except Exception:
         return default_state()
@@ -64,7 +65,7 @@ def save_state(path, state):
     if directory and not os.path.isdir(directory):
         os.makedirs(directory)
     tmp = path + '.tmp'
-    with open(tmp, 'w') as fh:
+    with io.open(tmp, 'w', encoding='utf-8') as fh:
         json.dump(payload, fh, indent=2, sort_keys=True)
         fh.flush()
         try:

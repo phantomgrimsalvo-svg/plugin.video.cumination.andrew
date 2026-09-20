@@ -1,6 +1,6 @@
 # Skin / Arctic Fuse 3 search plugin URLs
 
-Cumination (Andrew) **1.2.9** exposes a stable plugin path that skins (including Arctic Fuse 3 search widgets / search fields) can call. When `keyword` is present and non-empty, the addon **does not open the keyboard** — it runs aggregated search and returns **one combined video list**.
+Cumination (Andrew) **1.2.10** exposes a stable plugin path that skins (including Arctic Fuse 3 search widgets / search fields) can call. When `keyword` is present and non-empty, the addon **does not open the keyboard** — it runs aggregated search and returns **one combined video list**.
 
 ## Use this URL in AF3 (recommended)
 

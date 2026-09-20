@@ -34,6 +34,7 @@ import resources.lib.sites  # noqa: F401  # registers AdultSite instances
 from resources.lib import gsearch  # noqa: F401  # aggregated search + skin_search handlers
 from resources.lib import siteflags  # noqa: F401  # site enable/disable settings actions
 from resources.lib import precache  # noqa: F401  # image/list precache actions
+from resources.lib import textio
 
 socket.setdefaulttimeout(60)
 
@@ -62,10 +63,19 @@ if addon.getSetting('custom_sites') == 'true':
 
 @url_dispatcher.register()
 def INDEX():
+    try:
+        siteflags.refresh_status_setting()
+        precache.refresh_status_setting()
+    except Exception:
+        pass
     url_dispatcher.add_dir('[COLOR white]{}[/COLOR]'.format(utils.i18n('sites')), '', 'site_list',
+                           basics.cum_image('cum-sites.png'), '', list_avail=False)
+    url_dispatcher.add_dir('[COLOR white]Sites manager[/COLOR]', '', 'siteflags.menu',
                            basics.cum_image('cum-sites.png'), '', list_avail=False)
     url_dispatcher.add_dir('[COLOR hotpink]Search all sites[/COLOR]', '', 'global_search',
                            basics.cum_image('cum-search.png'), '', list_avail=False)
+    url_dispatcher.add_dir('[COLOR white]Precache[/COLOR]', '', 'precache.menu',
+                           basics.cum_image('cum-downloads.png'), '', list_avail=False)
     url_dispatcher.add_dir('[COLOR white]{}[/COLOR]'.format(utils.i18n('fav_videos')), '1', 'favorites.List',
                            basics.cum_image('cum-fav.png'), '', list_avail=False)
     download_path = addon.getSetting('download_path')
@@ -146,8 +156,7 @@ def openLogUploader():
 def about_site(name, about, custom):
     heading = '{0} {1}'.format(utils.i18n('about'), name)
     dir = basics.customSitesDir if custom else basics.aboutDir
-    with open(TRANSLATEPATH(os.path.join(dir, '{}.txt'.format(about)))) as f:
-        announce = f.read()
+    announce = textio.read_utf8(TRANSLATEPATH(os.path.join(dir, '{}.txt'.format(about))))
     utils.textBox(heading, announce)
 
 
@@ -157,8 +166,7 @@ def change():
         return
     addon.setSetting('changelog_seen_version', version)
     heading = '[B][COLOR hotpink]Cumination[/COLOR] [COLOR white]Changelog[/COLOR][/B]'
-    with open(basics.changelog) as f:
-        cl_lines = f.readlines()
+    cl_lines = textio.read_utf8_lines(basics.changelog)
     announce = ''
     for line in cl_lines:
         if not line.strip():

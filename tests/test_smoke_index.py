@@ -45,7 +45,7 @@ def _install_kodi_stubs(profile):
                 'custom_sites': 'false',
                 'enh_debug': 'false',
                 'cuminationage': 'true',
-                'changelog_seen_version': '1.2.9',
+                'changelog_seen_version': '1.2.10',
                 'customview': 'false',
                 'posterfanart': 'false',
                 'cache_time': '4',
@@ -61,7 +61,7 @@ def _install_kodi_stubs(profile):
             return {
                 'path': ROOT,
                 'profile': profile,
-                'version': '1.2.9',
+                'version': '1.2.10',
             }.get(key, '')
 
         def getLocalizedString(self, i):
@@ -214,8 +214,10 @@ class PluginOpenSmokeTests(unittest.TestCase):
         self.assertTrue(hasattr(plugin, 'precache'))
         plugin.INDEX()
         blob = ' '.join(names).lower()
-        self.assertGreaterEqual(len(names), 3)
+        self.assertGreaterEqual(len(names), 5)
         self.assertIn('search all sites', blob)
+        self.assertIn('sites manager', blob)
+        self.assertIn('precache', blob)
 
 
 if __name__ == '__main__':

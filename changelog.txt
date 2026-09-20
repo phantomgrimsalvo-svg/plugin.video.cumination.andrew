@@ -1,3 +1,8 @@
+[B]Version 1.2.10[/B]
+- Changelog and About text are read as UTF-8 so first-open no longer crashes on an em dash
+- Sites and Precache settings tabs sit right after General
+- Main menu: Sites manager and Precache (choose sites, Precache now, status) so you do not need settings tabs
+
 [B]Version 1.2.9[/B]
 - Fix: addon would not open on 1.2.8 (SyntaxError: import * only allowed at module level in precache.py)
 - Site enable/disable and Precache now are usable again; compileall smoke runs before the zip is packed

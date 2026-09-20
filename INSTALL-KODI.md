@@ -1,4 +1,4 @@
-# Install Cumination (Andrew) 1.2.9
+# Install Cumination (Andrew) 1.2.10
 
 ## Skin search URL (Arctic Fuse 3)
 
@@ -28,16 +28,17 @@ Requires stock **script.module.pil** (Pillow) in addition to ResolveURL, six, ko
 
 ## Direct zip (fastest)
 
-https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.9/plugin.video.cumination.andrew-1.2.9.zip
+https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.10/plugin.video.cumination.andrew-1.2.10.zip
 
-If 1.2.8 is installed it will not open (SyntaxError in precache.py). Install this zip over it (Unknown sources on). Favorites and keywords databases are migrated in place (custom list artwork columns are added; nothing is wiped). Site on/off flags and precache queue live in addon_data (`siteflags.json`, `precache.json`) and start empty (all sites on).
+If 1.2.9 (or 1.2.8) is already installed, install this zip over it (Unknown sources on). 1.2.8 would not open; 1.2.9 could crash on first-open changelog. Favorites and keywords databases are migrated in place. Site on/off flags and precache queue live in addon_data (`siteflags.json`, `precache.json`) and start empty (all sites on).
 
-Release page: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.9
+Release page: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.10
 
-## Site list + Precache (1.2.9)
+## Site list + Precache (1.2.10)
 
-- **Addon settings → Sites** — choose which sites are on. Disabled sites do not appear in Sites, Search all sites, or precache.
-- **Addon settings → Precache** — pick sites (defaults to enabled), set levels deep, **Precache now**. Images/lists only; never videos. Details: `PRECACHE.md` in this zip.
+- **Main menu → Sites manager** and **Main menu → Precache** — you do not need to hunt settings tabs.
+- **Addon settings** (second and third tabs, after General): Sites / Precache.
+- Disabled sites do not appear in Sites, Search all sites, or precache. Precache is images/lists only; never videos. Details: `PRECACHE.md` in this zip.
 
 ## Optional: repository 1.1.2 (this repo + existing deps)
 

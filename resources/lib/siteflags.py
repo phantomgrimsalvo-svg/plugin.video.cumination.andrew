@@ -14,6 +14,14 @@ from resources.lib.url_dispatcher import URL_Dispatcher
 
 url_dispatcher = URL_Dispatcher('siteflags')
 
+
+def _refresh_container():
+    try:
+        from kodi_six import xbmc
+        xbmc.executebuiltin('Container.Refresh')
+    except Exception:
+        pass
+
 _STATE_CACHE = {'mtime': None, 'state': None, 'path': None}
 
 
@@ -132,6 +140,7 @@ def choose_enabled():
     state['disabled'] = siteflags_lib.disabled_from_selection(catalog_names(), selected)
     save_state(state)
     _notify(siteflags_lib.enabled_summary(catalog_names(), state))
+    _refresh_container()
 
 
 @url_dispatcher.register()
@@ -140,6 +149,7 @@ def enable_all():
     state['disabled'] = []
     save_state(state)
     _notify(siteflags_lib.enabled_summary(catalog_names(), state))
+    _refresh_container()
 
 
 @url_dispatcher.register()
@@ -153,6 +163,7 @@ def disable_all():
     state['disabled'] = [n.lower() for n in catalog_names()]
     save_state(state)
     _notify(siteflags_lib.enabled_summary(catalog_names(), state))
+    _refresh_container()
 
 
 @url_dispatcher.register()
@@ -170,8 +181,41 @@ def disable_webcams():
     save_state(state)
     _notify('Disabled {0} webcam site(s). {1}'.format(
         added, siteflags_lib.enabled_summary(catalog_names(), state)))
+    _refresh_container()
 
 
 @url_dispatcher.register()
 def refresh_status():
     refresh_status_setting()
+
+
+@url_dispatcher.register()
+def menu():
+    """Directory of site enable/disable actions (reachable from INDEX)."""
+    summary = refresh_status_setting()
+    basics.addDir(
+        '[COLOR hotpink]{0}[/COLOR]'.format(summary),
+        '', 'siteflags.refresh_status', basics.cum_image('cum-sites.png'),
+        Folder=False, list_avail=False,
+    )
+    basics.addDir(
+        '[COLOR white]Choose enabled sites[/COLOR]',
+        '', 'siteflags.choose_enabled', basics.cum_image('cum-sites.png'),
+        Folder=False, list_avail=False,
+    )
+    basics.addDir(
+        '[COLOR white]Enable all sites[/COLOR]',
+        '', 'siteflags.enable_all', basics.cum_image('cum-sites.png'),
+        Folder=False, list_avail=False,
+    )
+    basics.addDir(
+        '[COLOR white]Disable all sites[/COLOR]',
+        '', 'siteflags.disable_all', basics.cum_image('cum-sites.png'),
+        Folder=False, list_avail=False,
+    )
+    basics.addDir(
+        '[COLOR white]Disable webcam sites[/COLOR]',
+        '', 'siteflags.disable_webcams', basics.cum_image('cum-sites.png'),
+        Folder=False, list_avail=False,
+    )
+    utils.eod(basics.addon_handle, False)

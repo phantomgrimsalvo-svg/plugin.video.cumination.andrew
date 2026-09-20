@@ -1,4 +1,4 @@
-# Precache (Cumination Andrew 1.2.9)
+# Precache (Cumination Andrew 1.2.10)
 
 Adult addon: this tool **never downloads videos**. It only fetches **list/HTML pages** and **thumbnails / fanart / logos** into Kodi addon data so browsing and search feel faster when the cache is hot.
 
@@ -10,9 +10,9 @@ In Kodi: **Add-ons → Cumination (Andrew) → Configure** (or context **Addon s
 
 | What | Where |
 |---|---|
-| Which sites appear at all | **Sites** |
+| Which sites appear at all | **Main menu → Sites manager**, or **Addon settings** second tab (**Sites**, after General) |
+| Image/list crawl | **Main menu → Precache**, or **Addon settings** third tab (**Precache**) |
 | Global search skips disabled sites | **Global search** → **Global search: only enabled sites** (default on) |
-| Image/list crawl | **Precache** |
 
 Disabled sites are hidden from the **Sites** list, from **Search all sites** (when the setting above is on), and from precache. Favorites/keywords you already saved are not wiped.
 
@@ -20,7 +20,7 @@ Site toggles are stored as `siteflags.json` under the addon profile (a disabled-
 
 ## Pick sites
 
-1. Open **Sites → Choose enabled sites**. Scroll the checkbox list; unchecked sites are off.
+1. Open **Sites manager** on the addon home (or **Settings → Sites → Choose enabled sites**). Scroll the checkbox list; unchecked sites are off.
 2. Optional shortcuts: **Enable all**, **Disable all**, **Disable webcam sites**.
 3. Open **Precache → Choose sites to precache** if you want a smaller crawl than “everything still enabled”. **Precache list: use enabled sites** resets that to follow the Sites list.
 
