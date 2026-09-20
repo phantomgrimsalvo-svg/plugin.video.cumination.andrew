@@ -32,6 +32,8 @@ from resources.lib import pin
 from resources.lib.adultsite import AdultSite
 from resources.lib.sites import *  # noqa
 from resources.lib import gsearch  # noqa: F401  # aggregated search + skin_search handlers
+from resources.lib import siteflags  # noqa: F401  # site enable/disable settings actions
+from resources.lib import precache  # noqa: F401  # image/list precache actions
 
 socket.setdefaulttimeout(60)
 
@@ -44,6 +46,7 @@ progress = utils.progress
 dialog = utils.dialog
 
 url_dispatcher = URL_Dispatcher('main')
+AdultSite.set_enabled_check(siteflags.is_enabled)
 
 if addon.getSetting('custom_sites') == 'true':
     sys.path.append(basics.customSitesDir)

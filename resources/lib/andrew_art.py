@@ -213,6 +213,28 @@ def _src_cache_path(url, settings):
     return os.path.join(cache_dir, 'src', _cache_name(url, 'src', '')[:-4] + ext)
 
 
+def src_cache_path_for_url(url, settings):
+    """Stable addon_data/artcache/src path for a remote image URL."""
+    if not url or not _is_url(url):
+        return None
+    return _src_cache_path(_strip_kodi_suffix(url), settings)
+
+
+def resolve_cached_image(src, settings=None):
+    """Prefer a previously downloaded thumb/fanart/logo file when present."""
+    if not src:
+        return src
+    settings = settings or {}
+    if not _is_url(src):
+        return src
+    stripped = _strip_kodi_suffix(src)
+    for candidate in (stripped, src):
+        path = _cached_url_original(candidate, settings)
+        if path:
+            return path
+    return src
+
+
 def _open_image(src, settings=None):
     ImageMod = _import_pil()
     if ImageMod is None or not src:
@@ -223,12 +245,15 @@ def _open_image(src, settings=None):
     if locals_found:
         path = locals_found[0]
     elif _is_url(src):
-        if not settings.get('allow_remote_fetch'):
-            path = _cached_url_original(src, settings)
+        cached = resolve_cached_image(src, settings)
+        if cached and cached != src and os.path.isfile(cached):
+            path = cached
+        elif not settings.get('allow_remote_fetch'):
+            path = _cached_url_original(_strip_kodi_suffix(src), settings) or _cached_url_original(src, settings)
             if not path:
                 return None
         else:
-            path = _fetch_url(src, settings)
+            path = _fetch_url(_strip_kodi_suffix(src), settings)
             if not path:
                 return None
     elif os.path.isfile(src):
@@ -594,6 +619,10 @@ def build_art(iconimage, fanart=None, is_folder=False, settings=None):
     with Mode A (pillarbox), B (top-aligned fill), or C (pan start + frames).
     """
     settings = dict(default_settings(), **(settings or {}))
+    if not is_folder:
+        iconimage = resolve_cached_image(iconimage, settings)
+        if fanart:
+            fanart = resolve_cached_image(fanart, settings)
     posterfanart = settings.get('posterfanart')
     extras = settings.get('portrait_fanart_extras')
     p_mode = settings.get('portrait_fanart_mode') or MODE_PILLARBOX

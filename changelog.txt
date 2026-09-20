@@ -1,3 +1,10 @@
+[B]Version 1.2.8[/B]
+- Sites you turn off stay out of the Sites list, Search all sites, and precache (Settings → Sites)
+- Precache now: crawl selected sites N levels deep and cache thumbnails/fanart/logos only — never videos (Settings → Precache)
+- Background service continues after you leave settings; queue survives a Kodi restart; Stop precache cancels
+- Browsing uses cached thumbs when present; global search defaults to enabled sites only
+- See PRECACHE.md for site picks, depth, and expected disk use
+
 [B]Version 1.2.7[/B]
 - Search all sites now returns ONE combined video list (not per-site Search folders)
 - Skin/AF3 plugin URL: plugin://plugin.video.cumination.andrew/?mode=skin_search&keyword=  (skips keyboard when keyword is set)

@@ -11,8 +11,12 @@ __scriptname__ = "Cumination"
 __author__ = "Cumination"
 __scriptid__ = "plugin.video.cumination.andrew"
 
-addon_handle = int(sys.argv[1])
-addon_sys = sys.argv[0]
+addon_handle = -1
+try:
+    addon_handle = int(sys.argv[1])
+except Exception:
+    addon_handle = -1
+addon_sys = sys.argv[0] if sys.argv else 'plugin://plugin.video.cumination.andrew/'
 addon = xbmcaddon.Addon()
 TRANSLATEPATH = xbmcvfs.translatePath if six.PY3 else xbmc.translatePath
 
