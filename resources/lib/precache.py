@@ -2,7 +2,9 @@
 """Image/list precache runner (never downloads videos)."""
 from __future__ import absolute_import
 
+import importlib
 import os
+import sys
 import threading
 import time
 
@@ -95,13 +97,12 @@ def ensure_sites_loaded():
     if _SITES_LOADED:
         return
     try:
-        from resources.lib.sites import *  # noqa: F401,F403
+        # Package __init__ imports each site module; no star-import (illegal in a function).
+        importlib.import_module('resources.lib.sites')
     except Exception as exc:
         utils.kodilog('precache: site import {0}'.format(exc))
     try:
         if basics.addon.getSetting('custom_sites') == 'true':
-            import importlib
-            import sys
             from resources.lib import favorites
             sys.path.append(basics.customSitesDir)
             for module_name in favorites.enabled_custom_sites():

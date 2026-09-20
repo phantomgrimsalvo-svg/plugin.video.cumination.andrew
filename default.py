@@ -30,7 +30,7 @@ from resources.lib import utils
 from resources.lib import favorites
 from resources.lib import pin
 from resources.lib.adultsite import AdultSite
-from resources.lib.sites import *  # noqa
+import resources.lib.sites  # noqa: F401  # registers AdultSite instances
 from resources.lib import gsearch  # noqa: F401  # aggregated search + skin_search handlers
 from resources.lib import siteflags  # noqa: F401  # site enable/disable settings actions
 from resources.lib import precache  # noqa: F401  # image/list precache actions

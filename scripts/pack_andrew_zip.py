@@ -12,6 +12,8 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 ADDON_ID = 'plugin.video.cumination.andrew'
 EXCLUDE_DIRS = {'.git', '__pycache__', 'artifacts', 'tests', 'scripts', 'workshop'}
 EXCLUDE_FILES = {'.gitignore'}
+COMPILE_ROOTS = ('resources',)
+COMPILE_FILES = ('default.py', 'service.py')
 
 
 def addon_version():
@@ -34,8 +36,26 @@ def should_skip(rel):
     return False
 
 
+def smoke_compile():
+    """Fail the pack if any shipped Python file cannot compile (catches nested import *)."""
+    import compileall
+    import py_compile
+
+    for name in COMPILE_FILES:
+        path = os.path.join(ROOT, name)
+        py_compile.compile(path, doraise=True)
+        print('compile', name)
+    for rel in COMPILE_ROOTS:
+        path = os.path.join(ROOT, rel)
+        ok = compileall.compile_dir(path, quiet=1, force=True)
+        if not ok:
+            raise RuntimeError('compileall failed under {0}'.format(rel))
+        print('compileall', rel)
+
+
 def pack(dest_dir=None, include_framed=True):
     sys.path.insert(0, ROOT)
+    smoke_compile()
     version = addon_version()
     dest_dir = dest_dir or os.path.join(ROOT, 'artifacts')
     os.makedirs(dest_dir, exist_ok=True)

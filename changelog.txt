@@ -1,3 +1,7 @@
+[B]Version 1.2.9[/B]
+- Fix: addon would not open on 1.2.8 (SyntaxError: import * only allowed at module level in precache.py)
+- Site enable/disable and Precache now are usable again; compileall smoke runs before the zip is packed
+
 [B]Version 1.2.8[/B]
 - Sites you turn off stay out of the Sites list, Search all sites, and precache (Settings → Sites)
 - Precache now: crawl selected sites N levels deep and cache thumbnails/fanart/logos only — never videos (Settings → Precache)

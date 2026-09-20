@@ -1,4 +1,4 @@
-# Install Cumination (Andrew) 1.2.8
+# Install Cumination (Andrew) 1.2.9
 
 ## Skin search URL (Arctic Fuse 3)
 
@@ -28,13 +28,13 @@ Requires stock **script.module.pil** (Pillow) in addition to ResolveURL, six, ko
 
 ## Direct zip (fastest)
 
-https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.8/plugin.video.cumination.andrew-1.2.8.zip
+https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/download/v1.2.9/plugin.video.cumination.andrew-1.2.9.zip
 
-If 1.2.7 (or earlier) is already installed, install this zip over it (Unknown sources on). Favorites and keywords databases are migrated in place (custom list artwork columns are added; nothing is wiped). Site on/off flags and precache queue live in addon_data (`siteflags.json`, `precache.json`) and start empty (all sites on).
+If 1.2.8 is installed it will not open (SyntaxError in precache.py). Install this zip over it (Unknown sources on). Favorites and keywords databases are migrated in place (custom list artwork columns are added; nothing is wiped). Site on/off flags and precache queue live in addon_data (`siteflags.json`, `precache.json`) and start empty (all sites on).
 
-Release page: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.8
+Release page: https://github.com/phantomgrimsalvo-svg/plugin.video.cumination.andrew/releases/tag/v1.2.9
 
-## Site list + Precache (1.2.8)
+## Site list + Precache (1.2.9)
 
 - **Addon settings → Sites** — choose which sites are on. Disabled sites do not appear in Sites, Search all sites, or precache.
 - **Addon settings → Precache** — pick sites (defaults to enabled), set levels deep, **Precache now**. Images/lists only; never videos. Details: `PRECACHE.md` in this zip.

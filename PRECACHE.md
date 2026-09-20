@@ -1,4 +1,4 @@
-# Precache (Cumination Andrew 1.2.8)
+# Precache (Cumination Andrew 1.2.9)
 
 Adult addon: this tool **never downloads videos**. It only fetches **list/HTML pages** and **thumbnails / fanart / logos** into Kodi addon data so browsing and search feel faster when the cache is hot.
 
