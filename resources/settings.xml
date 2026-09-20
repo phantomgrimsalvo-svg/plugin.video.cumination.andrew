@@ -17,6 +17,17 @@
         <setting id="setpin" type="action" label="30028" enable="true" option="close" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=pin.SetPin)" />
         <setting id="content" type="enum" label="30500" lvalues="30501|30502" default="0" />
     </category>
+    <category label="33100">
+        <setting type="lsep" label="33100" />
+        <setting id="global_search_sort" type="enum" lvalues="33109|33110|33111|33112" label="33108" default="0"/>
+        <setting id="global_search_timeout" type="slider" label="33101" default="12" range="5,1,30" option="int" />
+        <setting id="global_search_concurrency" type="slider" label="33102" default="6" range="1,1,12" option="int" />
+        <setting id="global_search_max_sites" type="slider" label="33103" default="30" range="5,5,150" option="int" />
+        <setting id="global_search_max_per_site" type="slider" label="33104" default="24" range="5,1,50" option="int" />
+        <setting id="global_search_webcams" type="bool" label="33105" default="false" />
+        <setting id="global_search_exclude" type="text" label="33106" default=""/>
+        <setting id="global_search_include" type="text" label="33107" default=""/>
+    </category>
     <category label="30065">
         <setting type="lsep" label="30029" />
         <setting id="clear_cache" label="33011" type="action" action="RunPlugin(plugin://plugin.video.cumination.andrew/?mode=utils.clear_cache)"/>

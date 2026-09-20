@@ -31,6 +31,7 @@ from resources.lib import favorites
 from resources.lib import pin
 from resources.lib.adultsite import AdultSite
 from resources.lib.sites import *  # noqa
+from resources.lib import gsearch  # noqa: F401  # aggregated search + skin_search handlers
 
 socket.setdefaulttimeout(60)
 
@@ -70,8 +71,11 @@ def INDEX():
                                basics.cum_image('cum-downloads.png'), '', list_avail=False)
 
     url_dispatcher.add_dir('[COLOR white]{}[/COLOR]'.format(utils.i18n('custom_list')), '', 'favorites.create_custom_list', Folder=False, list_avail=False)
-    for rowid, name in favorites.get_custom_lists():
-        url_dispatcher.add_dir(name, str(rowid), 'favorites.load_custom_list', list_avail=False, custom_list=True)
+    for row in favorites.get_custom_lists():
+        rowid, name = row[0], row[1]
+        thumb = row[2] if len(row) > 2 else None
+        url_dispatcher.add_dir(name, str(rowid), 'favorites.load_custom_list',
+                               iconimage=thumb or None, list_avail=False, custom_list=True)
     favorites.load_custom_list('main')
     url_dispatcher.add_dir('[COLOR white]{}[/COLOR]'.format(utils.i18n('clear_cache')), '', 'utils.clear_cache',
                            basics.cuminationicon, '', Folder=False, list_avail=False)
@@ -96,34 +100,21 @@ def site_list():
 
 
 @url_dispatcher.register()
-def global_search(url='', keyword=None):
-    """Search all sites: prompt once, then list every registered Search mode with that keyword."""
-    from resources.lib.basics import addDir, cum_image
-    from resources.lib.url_dispatcher import URL_Dispatcher
+def global_search(url='', keyword=None, sort=None, query=None, q=None):
+    """Search all sites: one combined results list (keyboard if no keyword)."""
+    gsearch.run(keyword=keyword or query or q, sort=sort, prompt=True)
 
-    if not keyword:
-        keyboard = xbmc.Keyboard('', 'Search all sites')
-        keyboard.doModal()
-        if not (keyboard.isConfirmed() and keyboard.getText()):
-            return
-        keyword = keyboard.getText()
 
-    search_modes = sorted(
-        m for m in URL_Dispatcher.func_registry
-        if m.split('.')[-1].lower() in ('search', 'xtsearch') or m.lower().endswith('.search')
-    )
-    if not search_modes:
-        dialog.ok('Cumination (Andrew)', 'No site Search handlers are loaded.')
-        return
+@url_dispatcher.register()
+def skin_search(url='', keyword=None, sort=None, query=None, q=None):
+    """AF3 / skin search box: never pop the keyboard; keyword comes from the URL."""
+    gsearch.run(keyword=keyword or query or q, sort=sort, prompt=False)
 
-    for mode in search_modes:
-        site_name = mode.split('.')[0]
-        site = AdultSite.get_site_by_name(site_name)
-        title = site.get_clean_title() if site else site_name
-        icon = site.image if site and site.image else cum_image('cum-search.png')
-        addDir('[COLOR hotpink]{0}[/COLOR] — {1}'.format(title, keyword),
-               site.url if site else '', mode, icon, keyword=keyword)
-    utils.eod(basics.addon_handle, False)
+
+@url_dispatcher.register()
+def search(url='', keyword=None, sort=None, query=None, q=None):
+    """Alias of skin_search for plugin://...?mode=search&keyword=."""
+    gsearch.run(keyword=keyword or query or q, sort=sort, prompt=False)
 
 
 @url_dispatcher.register()
@@ -185,12 +176,14 @@ else:
 def process_queries(argv):
     if sys.argv:
         argv = sys.argv
-    queries = utils.parse_query(argv[2])
+    queries = utils.parse_query(argv[2] if len(argv) > 2 else '')
+    queries = gsearch.normalize_plugin_queries(queries)
     mode = queries.get('mode', None)
     widget = bool(queries.get('widget', ''))
-    if widget:
+    if widget and mode and '.' in str(mode):
         ins = AdultSite.get_site_by_name(mode.split('.')[0])
-        ins.widget = True
+        if ins:
+            ins.widget = True
     url_dispatcher.dispatch(mode, queries)
 
 

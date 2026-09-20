@@ -1,3 +1,12 @@
+[B]Version 1.2.7[/B]
+- Search all sites now returns ONE combined video list (not per-site Search folders)
+- Skin/AF3 plugin URL: plugin://plugin.video.cumination.andrew/?mode=skin_search&keyword=  (skips keyboard when keyword is set)
+- Sort the combined list by relevance (default), newest, views, or rating; last sort is saved
+- Context: Add to keywords / save this search as a keyword (existing keywords table)
+- Custom favorite lists: Set artwork / Clear artwork (file or URL) for thumb, fanart, poster
+- Per-site timeout, concurrency, include/exclude, webcam opt-in under Settings → Global search
+- Failed sites are skipped so one timeout cannot kill the whole search
+
 [B]Version 1.2.6[/B]
 - Mode A pillarbox (and letterbox) now upscale small portrait thumbs to full 720px height with black bars only on the left/right — no more postage-stamp in the middle
 - Mode B/C cover and pan always scale to fill 1280×720

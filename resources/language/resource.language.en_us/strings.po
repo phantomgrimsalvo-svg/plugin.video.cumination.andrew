@@ -687,3 +687,55 @@ msgstr ""
 msgctxt "#33027"
 msgid "Page Item Limit (0=no pagination)"
 msgstr ""
+
+msgctxt "#33100"
+msgid "Global search"
+msgstr "Global search"
+
+msgctxt "#33101"
+msgid "Timeout per site (seconds)"
+msgstr "Timeout per site (seconds)"
+
+msgctxt "#33102"
+msgid "Concurrent site searches"
+msgstr "Concurrent site searches"
+
+msgctxt "#33103"
+msgid "Max sites per search"
+msgstr "Max sites per search"
+
+msgctxt "#33104"
+msgid "Max results per site"
+msgstr "Max results per site"
+
+msgctxt "#33105"
+msgid "Include webcam sites"
+msgstr "Include webcam sites"
+
+msgctxt "#33106"
+msgid "Exclude sites (comma-separated ids, e.g. pornhub,xvideos)"
+msgstr "Exclude sites (comma-separated ids, e.g. pornhub,xvideos)"
+
+msgctxt "#33107"
+msgid "Only these sites (blank = all)"
+msgstr "Only these sites (blank = all)"
+
+msgctxt "#33108"
+msgid "Combined list sort"
+msgstr "Combined list sort"
+
+msgctxt "#33109"
+msgid "Relevance"
+msgstr "Relevance"
+
+msgctxt "#33110"
+msgid "Newest"
+msgstr "Newest"
+
+msgctxt "#33111"
+msgid "Most viewed"
+msgstr "Most viewed"
+
+msgctxt "#33112"
+msgid "Top rated"
+msgstr "Top rated"

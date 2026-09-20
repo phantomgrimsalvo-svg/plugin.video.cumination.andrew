@@ -330,7 +330,30 @@ def addDir(name, url, mode, iconimage=None, page=None, channel=None, section=Non
     if not iconimage:
         iconimage = cuminationicon
     liz = xbmcgui.ListItem(name)
-    _apply_andrew_art(liz, iconimage, fanart=None, is_folder=True)
+    custom_art = None
+    if custom_list:
+        try:
+            from resources.lib import favorites as _fav
+            custom_art = _fav.get_custom_list_art(url)
+        except Exception:
+            custom_art = None
+    if custom_art and any(custom_art):
+        thumb, fanart, poster = custom_art
+        thumb = thumb or iconimage or cuminationicon
+        poster = poster or thumb
+        fanart = fanart or _addon_fanart()
+        liz.setArt({
+            'thumb': thumb,
+            'icon': thumb,
+            'poster': poster,
+            'fanart': fanart,
+            'banner': thumb,
+            'clearlogo': thumb,
+        })
+        liz.setProperty('Fanart_Image', fanart)
+        liz.setProperty('fanart', fanart)
+    else:
+        _apply_andrew_art(liz, iconimage, fanart=None, is_folder=True)
 
     # --- META DESCRIPTION SUPPORT ---
     try:
@@ -425,6 +448,14 @@ def addDir(name, url, mode, iconimage=None, page=None, channel=None, section=Non
                         + "?mode=" + str('favorites.edit_list')
                         + "&rowid=" + str(url))
         contextMenuItems.append(('[COLOR hotpink]Edit name[/COLOR]', 'RunPlugin(' + editlist_url + ')'))
+        setart_url = (sys.argv[0]
+                      + "?mode=" + str('favorites.set_list_artwork')
+                      + "&rowid=" + str(url))
+        contextMenuItems.append(('[COLOR hotpink]Set artwork[/COLOR]', 'RunPlugin(' + setart_url + ')'))
+        clearart_url = (sys.argv[0]
+                        + "?mode=" + str('favorites.clear_list_artwork')
+                        + "&rowid=" + str(url))
+        contextMenuItems.append(('[COLOR hotpink]Clear artwork[/COLOR]', 'RunPlugin(' + clearart_url + ')'))
         dellist_url = (sys.argv[0]
                        + "?mode=" + str('favorites.remove_list')
                        + "&rowid=" + str(url))
