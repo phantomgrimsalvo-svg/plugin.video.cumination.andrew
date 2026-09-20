@@ -787,3 +787,75 @@ msgstr "Most viewed"
 msgctxt "#33112"
 msgid "Top rated"
 msgstr "Top rated"
+
+msgctxt "#33113"
+msgid "Global search: only enabled sites"
+msgstr "Global search: only enabled sites"
+
+msgctxt "#33200"
+msgid "Sites"
+msgstr "Sites"
+
+msgctxt "#33201"
+msgid "Choose enabled sites"
+msgstr "Choose enabled sites"
+
+msgctxt "#33202"
+msgid "Enable all sites"
+msgstr "Enable all sites"
+
+msgctxt "#33203"
+msgid "Disable all sites"
+msgstr "Disable all sites"
+
+msgctxt "#33204"
+msgid "Disable webcam sites"
+msgstr "Disable webcam sites"
+
+msgctxt "#33205"
+msgid "Enabled sites"
+msgstr "Enabled sites"
+
+msgctxt "#33210"
+msgid "Precache"
+msgstr "Precache"
+
+msgctxt "#33211"
+msgid "Precache (thumbnails / lists only — never videos)"
+msgstr "Precache (thumbnails / lists only — never videos)"
+
+msgctxt "#33212"
+msgid "Choose sites to precache"
+msgstr "Choose sites to precache"
+
+msgctxt "#33213"
+msgid "Precache list: use enabled sites"
+msgstr "Precache list: use enabled sites"
+
+msgctxt "#33214"
+msgid "Levels deep (1=root, 2=categories, 3=lists)"
+msgstr "Levels deep (1=root, 2=categories, 3=lists)"
+
+msgctxt "#33215"
+msgid "Max images (0 = no limit)"
+msgstr "Max images (0 = no limit)"
+
+msgctxt "#33216"
+msgid "Max storage MB (0 = no limit)"
+msgstr "Max storage MB (0 = no limit)"
+
+msgctxt "#33217"
+msgid "Concurrent image downloads"
+msgstr "Concurrent image downloads"
+
+msgctxt "#33218"
+msgid "Precache now"
+msgstr "Precache now"
+
+msgctxt "#33219"
+msgid "Stop precache"
+msgstr "Stop precache"
+
+msgctxt "#33220"
+msgid "Precache status"
+msgstr "Precache status"

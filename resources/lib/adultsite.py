@@ -7,6 +7,22 @@ from resources.lib import basics
 class AdultSite(URL_Dispatcher):
     instances = WeakSet()
     clean_functions = set()
+    _enabled_check = None
+
+    @classmethod
+    def set_enabled_check(cls, func):
+        """Optional callable(name) -> bool. None means every site is enabled."""
+        cls._enabled_check = func
+
+    @classmethod
+    def site_is_enabled(cls, name):
+        check = cls._enabled_check
+        if not check:
+            return True
+        try:
+            return bool(check(name))
+        except Exception:
+            return True
 
     def __init__(self, name, title, url, image=None, about=None, webcam=False, extract_meta=False):
         self.default_mode = ''
@@ -44,15 +60,21 @@ class AdultSite(URL_Dispatcher):
         return dec
 
     @classmethod
-    def get_sites(cls):
+    def get_all_sites(cls):
         for ins in cls.instances:
             if ins.default_mode:
                 yield ins
 
     @classmethod
+    def get_sites(cls):
+        for ins in cls.get_all_sites():
+            if cls.site_is_enabled(ins.name):
+                yield ins
+
+    @classmethod
     def get_internal_sites(cls):
         for ins in cls.instances:
-            if ins.default_mode and not ins.custom:
+            if ins.default_mode and not ins.custom and cls.site_is_enabled(ins.name):
                 yield ins
 
     @classmethod
@@ -72,7 +94,7 @@ class AdultSite(URL_Dispatcher):
     @classmethod
     def get_custom_sites(cls):
         for ins in cls.instances:
-            if ins.default_mode and ins.custom:
+            if ins.default_mode and ins.custom and cls.site_is_enabled(ins.name):
                 yield ins
 
     def get_meta_description(self):

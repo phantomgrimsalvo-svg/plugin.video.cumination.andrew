@@ -70,7 +70,11 @@ def _kodilog(msg, level=None):
 
 
 def _is_collecting():
-    return bool(getattr(_tls, 'collecting', False) or getattr(_tls, 'harvest', False))
+    return bool(
+        getattr(_tls, 'collecting', False)
+        or getattr(_tls, 'harvest', False)
+        or getattr(_tls, 'precache', False)
+    )
 
 
 def _capturing_addDownLink(name, url, mode, iconimage, desc='', stream=None, fav='add',
@@ -95,14 +99,29 @@ def _capturing_addDownLink(name, url, mode, iconimage, desc='', stream=None, fav
                                 contextm, fanart, duration, quality)
 
 
+def _dir_payload(name, url, mode, iconimage, page, channel, section, keyword, Folder, site=''):
+    return {
+        'name': name,
+        'url': url,
+        'mode': mode,
+        'iconimage': iconimage,
+        'page': page,
+        'channel': channel,
+        'section': section,
+        'keyword': keyword,
+        'Folder': Folder,
+        'site': site,
+    }
+
+
 def _capturing_addDir(name, url, mode, iconimage=None, page=None, channel=None, section=None,
                       keyword='', Folder=True, about=None, custom=False, list_avail=True,
                       listitem_id=None, custom_list=False, contextm=None, desc=''):
-    if getattr(_tls, 'harvest', False):
-        full = mode
+    if getattr(_tls, 'harvest', False) or getattr(_tls, 'precache', False):
         buf = getattr(_tls, 'dirs', None)
         if buf is not None:
-            buf.append({'name': name, 'url': url, 'mode': full, 'iconimage': iconimage})
+            buf.append(_dir_payload(name, url, mode, iconimage, page, channel, section,
+                                    keyword, Folder))
         return True
     if getattr(_tls, 'collecting', False):
         return True
@@ -172,11 +191,13 @@ def _patched_add_dir(self, name, url, mode, iconimage=None, page=None, channel=N
                      keyword='', Folder=True, about=None, custom=False, list_avail=True,
                      listitem_id=None, custom_list=False, contextm=None, desc=''):
     mode = self.get_full_mode(mode)
-    if getattr(_tls, 'harvest', False):
+    if getattr(_tls, 'harvest', False) or getattr(_tls, 'precache', False):
         buf = getattr(_tls, 'dirs', None)
         if buf is not None:
-            buf.append({'name': name, 'url': url, 'mode': mode, 'iconimage': iconimage,
-                        'site': getattr(self, 'name', '')})
+            buf.append(_dir_payload(
+                name, url, mode, iconimage, page, channel, section, keyword, Folder,
+                site=getattr(self, 'name', ''),
+            ))
         return True
     if getattr(_tls, 'collecting', False):
         return True
@@ -186,7 +207,7 @@ def _patched_add_dir(self, name, url, mode, iconimage=None, page=None, channel=N
     )
 
 
-def _call_registered(mode, url, keyword=None):
+def _call_registered(mode, url, keyword=None, extra=None):
     func = URL_Dispatcher.func_registry.get(mode)
     if not func:
         raise RuntimeError('unregistered mode {0}'.format(mode))
@@ -197,18 +218,26 @@ def _call_registered(mode, url, keyword=None):
     pos_names = args[:-len(defaults)] if defaults else args
     call_args = []
     call_kwargs = {}
-    values = {'url': url, 'keyword': keyword, 'name': keyword}
+    extra = extra or {}
+    values = {
+        'url': extra.get('url', url),
+        'keyword': keyword if keyword is not None else extra.get('keyword'),
+        'name': extra.get('name') or keyword,
+        'page': extra.get('page'),
+        'channel': extra.get('channel'),
+        'section': extra.get('section'),
+    }
     for name in pos_names:
         if name == 'self':
             continue
-        if name in values and values[name] is not None:
+        if name in values and values[name] is not None and str(values[name]) not in ('None', 'none'):
             call_args.append(values[name])
         elif name == 'url':
             call_args.append(url or '')
         else:
             raise RuntimeError('cannot fill required arg {0} for {1}'.format(name, mode))
     for name in kwarg_names:
-        if name in values and values[name] is not None:
+        if name in values and values[name] is not None and str(values[name]) not in ('None', 'none'):
             call_kwargs[name] = values[name]
     return func(*call_args, **call_kwargs)
 
@@ -262,6 +291,73 @@ def harvest_search_entry(site):
     return None
 
 
+def harvest_listing(mode, url, extra=None, timeout=20, item_limit=4000):
+    """Run a registered list mode and capture folders + video rows (no Kodi UI)."""
+    _install_patches()
+    extra = extra or {}
+    _tls.precache = True
+    _tls.harvest = True
+    _tls.collecting = True
+    _tls.dirs = []
+    _tls.items = []
+    _tls.limit = item_limit
+    prev_to = socket.getdefaulttimeout()
+    socket.setdefaulttimeout(max(4, int(timeout or 20)))
+    from resources.lib import utils as utils_mod
+    orig_dialog = getattr(utils_mod, 'dialog', None)
+
+    class _QuietDialog(object):
+        def ok(self, *a, **k):
+            return True
+
+        def yesno(self, *a, **k):
+            return False
+
+        def select(self, *a, **k):
+            return -1
+
+        def multiselect(self, *a, **k):
+            return None
+
+        def browse(self, *a, **k):
+            return ''
+
+        def input(self, *a, **k):
+            return ''
+
+        def numeric(self, *a, **k):
+            return ''
+
+        def notification(self, *a, **k):
+            return
+
+    try:
+        utils_mod.dialog = _QuietDialog()
+    except Exception:
+        pass
+    error = None
+    try:
+        _call_registered(mode, url, keyword=extra.get('keyword'), extra=extra)
+    except Exception as exc:
+        error = str(exc)
+    finally:
+        socket.setdefaulttimeout(prev_to)
+        try:
+            if orig_dialog is not None:
+                utils_mod.dialog = orig_dialog
+        except Exception:
+            pass
+        dirs = list(getattr(_tls, 'dirs', None) or [])
+        items = list(getattr(_tls, 'items', None) or [])
+        _tls.precache = False
+        _tls.harvest = False
+        _tls.collecting = False
+        _tls.dirs = None
+        _tls.items = None
+        _tls.limit = 9999
+    return dirs, items, error
+
+
 def _target_for_site(site):
     src_url, src_mode = _search_url_from_source(site)
     if src_url and url_looks_complete(src_url):
@@ -305,8 +401,9 @@ def _target_for_site(site):
     return None, None
 
 
-def iter_search_targets(include=None, exclude=None, webcams=False, max_sites=30):
-    sites = sorted(AdultSite.get_sites(), key=lambda s: (s.get_clean_title() or s.name or '').lower())
+def iter_search_targets(include=None, exclude=None, webcams=False, max_sites=30, enabled_only=True):
+    getter = AdultSite.get_sites if enabled_only else AdultSite.get_all_sites
+    sites = sorted(getter(), key=lambda s: (s.get_clean_title() or s.name or '').lower())
     count = 0
     for site in sites:
         if not site.default_mode:
@@ -413,6 +510,7 @@ def run(keyword=None, sort=None, prompt=True):
     include = parse_csv_names(_setting('global_search_include', ''))
     exclude = parse_csv_names(_setting('global_search_exclude', ''))
     webcams = _setting_bool('global_search_webcams', False)
+    enabled_only = _setting_bool('global_search_enabled_only', True)
     timeout = max(5, _setting_int('global_search_timeout', 12))
     workers = max(1, min(12, _setting_int('global_search_concurrency', 6)))
     max_sites = max(1, _setting_int('global_search_max_sites', 30))
@@ -424,7 +522,7 @@ def run(keyword=None, sort=None, prompt=True):
 
     targets = []
     try:
-        for row in iter_search_targets(include, exclude, webcams, max_sites):
+        for row in iter_search_targets(include, exclude, webcams, max_sites, enabled_only=enabled_only):
             targets.append(row)
             if progress and progress.iscanceled():
                 progress.close()

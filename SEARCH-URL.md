@@ -1,6 +1,6 @@
 # Skin / Arctic Fuse 3 search plugin URLs
 
-Cumination (Andrew) **1.2.7** exposes a stable plugin path that skins (including Arctic Fuse 3 search widgets / search fields) can call. When `keyword` is present and non-empty, the addon **does not open the keyboard** — it runs aggregated search and returns **one combined video list**.
+Cumination (Andrew) **1.2.10** exposes a stable plugin path that skins (including Arctic Fuse 3 search widgets / search fields) can call. When `keyword` is present and non-empty, the addon **does not open the keyboard** — it runs aggregated search and returns **one combined video list**.
 
 ## Use this URL in AF3 (recommended)
 
@@ -39,12 +39,12 @@ plugin://plugin.video.cumination.andrew/?mode=main.global_search&keyword=
 
 ## What you get
 
-- One Kodi directory mixing playable hits from enabled site Search handlers.
+- One Kodi directory mixing playable hits from **enabled** site Search handlers (disabled sites are skipped; turn that off under Settings → Global search if you want every module).
 - Titles look like `[SiteName] Video title`.
 - A site timeout or scrape error is skipped; the rest of the list still appears.
 - Sort: **Relevance** (default), **Newest**, **Most viewed**, **Top rated**. Last choice is stored in addon settings. Missing metadata sorts last.
 - Context: **Add to keywords** (from a result title) and **Save this search as keyword** (uses the existing `keywords` table).
 
-Tune include/exclude, webcam sites, timeout, concurrency, and caps under **Settings → Global search**.
+Tune include/exclude, webcam sites, timeout, concurrency, caps, and **only enabled sites** under **Settings → Global search**. Turn sites off under **Settings → Sites**. Image/list warmup is **Settings → Precache** ([PRECACHE.md](PRECACHE.md)).
 
 Adult content: this addon does not host videos; keep Kodi restricted-profiles / PIN as you already do.

@@ -93,8 +93,18 @@ def run():
     index = 0
     last_tick = 0.0
     direction = 1
+    last_precache = 0.0
 
     while not monitor.abortRequested():
+        now = time.time()
+        if now - last_precache >= 0.8:
+            last_precache = now
+            try:
+                from resources.lib import precache
+                precache.service_tick(monitor, budget_sec=1.4)
+            except Exception:
+                pass
+
         try:
             settings = andrew_art.settings_from_addon(
                 addon,
